@@ -27,10 +27,10 @@ Sources: `powermod-spec.md` §Pre-BOM electrical walk (net map), `powermod-bom.m
 | 23 | PA0 | `UPDI` | programming | **fixed**; reserved, never GPIO |
 | 5 | PA4 | `VBAT_SENSE` | ADC0 AIN4 | analog port pin; 1M/330k + 100nF |
 | 6 | PA5 | `VBUS_SENSE` | ADC0 AIN5 | analog port pin; identical divider |
-| 17 | PC0 | `RTC_SDA` | bit-banged, open-drain | internal bus |
-| 18 | PC1 | `RTC_SCL` | bit-banged, open-drain | internal bus |
-| 1 | PA2 | `RTC_INT` | input, 10k↑3V3 | **Px2 = fully-async pin** — edge wake from deepest sleep |
-| 19 | PC2 | `BUTTON` | input, internal pull-up | **Px2 = fully-async** — wake on press |
+| 24 | PA1 | `RTC_SDA` | bit-banged, open-drain | internal bus; **top-side pin faces the RTC** (routability, see §4) |
+| 22 | PC5 | `RTC_SCL` | bit-banged, open-drain | internal bus; **top-side pin faces the RTC** (routability, see §4) |
+| 19 | PC2 | `RTC_INT` | input, 10k↑3V3 | **Px2 = fully-async pin** — edge wake from deepest sleep |
+| 1 | PA2 | `BUTTON` | input, internal pull-up | **Px2 = fully-async** — wake on press |
 | 2 | PA3 | `CONV_EN` | output (+100k↓) | TPS63020 EN |
 | 20 | PC3 | `Q1_GATE_DRV` | output (+100k↓) | drives Q3 gate |
 | 21 | PC4 | `CHG_CE` | output | TP4056 CE (high = charge) |
@@ -40,7 +40,7 @@ Sources: `powermod-spec.md` §Pre-BOM electrical walk (net map), `powermod-bom.m
 | 13 | PB3 | `LED_PWR_B` | output, 560Ω | TOSC pin — free |
 | 10 | PB6 | `LED_BAT_A` | output, 560Ω | |
 | 9 | PB7 | `LED_BAT_B` | output, 560Ω | |
-| 24, 7, 8, 22 | PA1, PA6, PA7, PC5 | **spare ×4** | — | PA6/PA7 are ADC-capable — spares keep analog options open |
+| 7, 8, 17, 18 | PA6, PA7, PC0, PC1 | **spare ×4** | — | PA6/PA7 are ADC-capable — spares keep analog options open |
 | 4 / 3 / pad | VDD / GND / pad | 3V3 / GND / GND | | pad to GND (Microchip recommendation) |
 
 Board temperature needs **no pin** — internal ADC channel with `SIGROW.TEMPSENSE0/1` calibration.
@@ -106,10 +106,10 @@ IN (3) → VSYS + 1µF→GND; OUT (2) → **3V3** + 1µF→GND; VSS (1) → GND.
 | Pin | Net |
 |---|---|
 | 1 OSCI / 2 OSCO | Y1 32.768kHz crystal (CL per Belling — one cap on-die; confirm split at layout) |
-| 3 INT | `RTC_INT` = PA2 (pin 1); **10kΩ ↑ 3V3** (deliberately not the backup node — see spec) |
+| 3 INT | `RTC_INT` = PC2 (pin 19); **10kΩ ↑ 3V3** (deliberately not the backup node — see spec) |
 | 4 VSS | GND |
-| 5 SDA | `RTC_SDA` = PC0 (pin 17); 10kΩ ↑ 3V3 |
-| 6 SCL | `RTC_SCL` = PC1 (pin 18); 10kΩ ↑ 3V3 |
+| 5 SDA | `RTC_SDA` = PA1 (pin 24); 10kΩ ↑ 3V3 |
+| 6 SCL | `RTC_SCL` = PC5 (pin 22); 10kΩ ↑ 3V3 |
 | 7 CLKOUT | **NC** (open-drain; firmware writes FE=0 at init — ships enabled) |
 | 8 VDD | `RTC_VDD` node + 100nF → GND |
 
@@ -120,7 +120,7 @@ IN (3) → VSYS + 1µF→GND; OUT (2) → **3V3** + 1µF→GND; VSS (1) → GND.
 - **J4 (JST-SH/STEMMA)**: 1 GND, 2 **NC** (VCC position — deliberate), 3 SDA → PB1, 4 SCL → PB0. **No pull-ups fitted on this bus.** *(Confirm J4 pin order against the chosen connector's datasheet at capture — SH pin-1 orientation varies by mounting.)*
 - **D1 (Power LED, bicolor red/green, common-cathode → GND)**: anode A ← 560Ω ← PB2 (14); anode B ← 560Ω ← PB3 (13).
 - **D2 (Battery LED)**: anode A ← 560Ω ← PB6 (10); anode B ← 560Ω ← PB7 (9).
-- **SW1**: PC2 (19) → SW1 → GND (internal pull-up).
+- **SW1**: PA2 (1) → SW1 → GND (internal pull-up).
 - **UPDI header**: 1 UPDI → PA0 (23), 2 3V3, 3 GND.
 
 ### 2.9 USB-C output (J2) and VOUT header
@@ -141,14 +141,18 @@ IN (3) → VSYS + 1µF→GND; OUT (2) → **3V3** + 1µF→GND; VSS (1) → GND.
 
 ## 4. Layout (hardware/layout.py → powermod.kicad_pcb)
 
-**Status: placed, routed (Freerouting), compacted.** 56×40mm (was 62×46 — re-placed and re-routed in one 8-second pipeline cycle once routing became scripted), 2-layer, all 69 components + 4× M2 mounting holes, every pad net-bound (live ratsnest), GND poured both sides. `kicad-cli pcb drc`: **0 electrical/mechanical violations** — remaining items are the 160-edge ratsnest (routing is interactive work in pcbnew) and silk-text warnings (cleaned during routing).
+**Status: v1 complete — placed, fully routed, DRC clean.** **58×40mm** (62×46 → 56×40 → 58×40; the last +2mm on the right reopened a corridor that a pad wall had sealed), 2-layer, all 69 components + 4× M2.5 mounting holes 3.2mm in from each corner, every pad net-bound, GND poured both sides. `kicad-cli pcb drc --refill-zones --severity-error`: **0 violations, 0 unconnected pads, 0 footprint errors.** The 140 remaining all-severity items are silkscreen cosmetics (reference text over pads/mask), which do not affect fabrication.
 
 Floorplan intent, encoded in `layout.py` and verified by render: power flows left→right (J1 → charger/OR → VSYS → converter → VOUT → J2, both USB-C on the left edge); **the crystal sits ~36mm from the inductor loop** (checklist item 8); converter input/output caps flank U3 tightly; connectors and human-facing parts (LEDs, button, jumpers, test pads) on edges.
 
-**Routing — Freerouting pipeline (hardware/fr_pipeline.py), near-complete.** The right tool won: KiCad's bundled pcbnew Python exports Specctra DSN, Freerouting 2.2.4 routes headlessly (113/115 edges in 11 seconds, push-and-shove, 45°), the SES imports back, and scripted post-passes added 12 GND stitching vias, one B-layer route, and net bindings for **all five exposed pads, which the netlist had left floating** (KiCad names EPs numerically — "15"/"25"/"9" — not "EP"; found only because the EP showed up in a DRC clearance report).
+**Routing — Freerouting pipeline (hardware/fr_pipeline.py).** The right tool won: KiCad's bundled pcbnew Python exports Specctra DSN, Freerouting 2.2.4 routes headlessly (all signal nets, push-and-shove, 45°), the SES imports back, and scripted post-passes handle GND — Freerouting does not route pour nets, so every ground connection is ours to make (19 stitching vias + 2 plane-bridge vias). Freerouting runs are stochastic: the pipeline loops 3-4× and keeps the best result. The netlist also had **all five exposed pads floating** at one point (KiCad names EPs numerically — "15"/"25"/"9" — not "EP"; found only because an EP showed up in a DRC clearance report).
+
+**B.Cu keepouts under U2's exposed pad, SW1, R14 and J5 (`ko_*` rule areas).** Freerouting was threading signal traces beneath those pads — RTC_SDA passed under U2's EP, BUTTON came within 0.12mm of SW1's pad. That starves the pour and leaves no room to stitch ground. Forbidding B-side *tracks* there (vias and copper pour still allowed) eliminated all bottom-side pour fragmentation and costs nothing in routability. Routing under a QFN exposed pad is poor practice regardless; keep these in any re-layout.
 
 **Solder-pad pairs (user review, 2026-07-15): every documented pad interface now has its ground partner adjacent** — TP2/TP4 (BAT+GND), TP3/TP6 (VOUT+GND), TP1/TP5 (VBACKUP+GND). Previously one shared GND pad sat 36mm from VBACKUP — the guide's "two solder pads" promise was physically false; nobody spans a coin cell across a board.
 
-Current DRC: **0 shorts, 0 clearance violations, 0 crossings**; 13 unconnected items + 3 starved thermals remain — four hand-finish items in pcbnew: the two U2 escapes Freerouting also gave up on (LED_BAT_B, RTC_SCL — nudge an adjacent track one lane), a short strap for Q2's thermal pad (VBAT), and one GND spoke inside the U2 ring. **Not fab-ready until those close and a human reviews the converter loop.** My own grid router (hardware/router.py) remains as the obstacle/legality library the post-passes are built on.
+Current DRC: **0 shorts, 0 clearance violations, 0 crossings, 0 unconnected pads, 0 starved thermals.** Starved thermals were cleared by setting both pours to solid pad connection (`ZONE_CONNECTION_FULL`) rather than thermal spokes. **A human should still review the converter loop before fab** — that judgement was never delegated to the scripts. My own grid router (hardware/router.py) remains as the obstacle/legality library the GND post-passes are built on; it is *not* used for signal routing (every attempt to hand-route or rip-and-reroute a stubborn net made the board measurably worse and was reverted).
+
+Two `router.py` bugs distorted the obstacle map for hours before being caught, both worth knowing for v2: (1) pads without `F.Cu` were classified as bottom-layer copper, so **solder-paste stencil apertures became phantom B.Cu obstacles** — this is what made U2's 2.6mm exposed pad appear to have no room for a thermal via and the board read as hopelessly congested; (2) pour polygons were ranked by *bounding-box* area to identify "the main plane", but a snaky island has a huge bbox and little copper, so it won the vote and sent every connect-to-plane search into the wrong polygon. Union-find over fill polygons joined by vias/PTH pads gave the true picture: the F plane, the B plane and R14's pocket were three separate clusters — the planes themselves were never tied together.
 
 Layout-time notes: U3's exposed pad wants thermal vias — add them manually with ≥0.3mm drills (the library's ThermalVias variant uses 0.2mm, below the default DRC floor, which is why the plain footprint is specced); route the converter loop (C1/C2 → U3 → L1 → C3-C5) first and tight; VBUS/VSYS/VBAT/VOUT at ≥1mm width per the ratings table currents.
