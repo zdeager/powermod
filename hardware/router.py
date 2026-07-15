@@ -271,6 +271,10 @@ def build_escapes(pads,obs,codes,emitted):
             dx,dy=x-cx,y-cy
             if abs(dx)>abs(dy): dirs=[((1 if dx>0 else -1),0),(0,(1 if dy>=0 else -1))]
             else: dirs=[(0,(1 if dy>0 else -1)),((1 if dx>=0 else -1),0)]
+            # skip if a same-net track already originates at this pad (stub exists)
+            if any(n==tn and ((abs(x-x1)<0.05 and abs(y-y1)<0.05) or (abs(x-x2)<0.05 and abs(y-y2)<0.05))
+                   for x1,y1,x2,y2,hw,tn in obs.tracks['F']):
+                continue
             for ex,ey in dirs:
                 tx,ty=x+ex*ESCAPE_LEN,y+ey*ESCAPE_LEN
                 ok=all(not obs.blocked(n,0.2,'F',x+ex*ESCAPE_LEN*k/4.0,y+ey*ESCAPE_LEN*k/4.0,frozenset({i}))

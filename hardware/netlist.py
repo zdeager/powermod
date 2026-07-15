@@ -37,9 +37,9 @@ COMPONENTS = {
    '10':('PB6/LED_BAT_A','LED_BAT_A'), '11':('PB5/CHG_STDBY','CHG_STDBY'),
    '12':('PB4/CHG_CHRG','CHG_CHRG'), '13':('PB3/LED_PWR_B','LED_PWR_B'),
    '14':('PB2/LED_PWR_A','LED_PWR_A'), '15':('PB1/SDA','SDA'), '16':('PB0/SCL','SCL'),
-   '17':('PC0/RTC_SDA','RTC_SDA'), '18':('PC1/RTC_SCL','RTC_SCL'), '19':('PC2/BUTTON','BUTTON'),
-   '20':('PC3/Q1_GATE_DRV','Q1_GATE_DRV'), '21':('PC4/CHG_CE','CHG_CE'), '22':('PC5','NC'),
-   '23':('PA0/UPDI','UPDI'), '24':('PA1','NC'), '25':('PAD','GND')}),
+   '17':('PC0','NC'), '18':('PC1','NC'), '19':('PC2/BUTTON','BUTTON'),
+   '20':('PC3/Q1_GATE_DRV','Q1_GATE_DRV'), '21':('PC4/CHG_CE','CHG_CE'), '22':('PC5/RTC_SCL','RTC_SCL'),
+   '23':('PA0/UPDI','UPDI'), '24':('PA1/RTC_SDA','RTC_SDA'), '25':('PAD','GND')}),
  'U3': ('TPS63020DSJR', 'Package_SON:VSON-14-1EP_3x4.45mm_P0.65mm_EP1.6x4.2mm', 'C15483', {
    '1':('VINA','VSYS'), '2':('GND','GND'), '3':('FB','FB'), '4':('VOUT','VOUT'),
    '5':('VOUT','VOUT'), '6':('L2','L2'), '7':('L2','L2'), '8':('L1','L1N'),
