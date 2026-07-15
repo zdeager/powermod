@@ -141,11 +141,13 @@ IN (3) → VSYS + 1µF→GND; OUT (2) → **3V3** + 1µF→GND; VSS (1) → GND.
 
 ## 4. Layout (hardware/layout.py → powermod.kicad_pcb)
 
-**Status: placed and DRC-clean; unrouted.** 62×46mm, 2-layer, all 69 components + 4× M2 mounting holes, every pad net-bound (live ratsnest), GND poured both sides. `kicad-cli pcb drc`: **0 electrical/mechanical violations** — remaining items are the 160-edge ratsnest (routing is interactive work in pcbnew) and silk-text warnings (cleaned during routing).
+**Status: placed, routed (Freerouting), compacted.** 56×40mm (was 62×46 — re-placed and re-routed in one 8-second pipeline cycle once routing became scripted), 2-layer, all 69 components + 4× M2 mounting holes, every pad net-bound (live ratsnest), GND poured both sides. `kicad-cli pcb drc`: **0 electrical/mechanical violations** — remaining items are the 160-edge ratsnest (routing is interactive work in pcbnew) and silk-text warnings (cleaned during routing).
 
 Floorplan intent, encoded in `layout.py` and verified by render: power flows left→right (J1 → charger/OR → VSYS → converter → VOUT → J2, both USB-C on the left edge); **the crystal sits ~36mm from the inductor loop** (checklist item 8); converter input/output caps flank U3 tightly; connectors and human-facing parts (LEDs, button, jumpers, test pads) on edges.
 
 **Routing — Freerouting pipeline (hardware/fr_pipeline.py), near-complete.** The right tool won: KiCad's bundled pcbnew Python exports Specctra DSN, Freerouting 2.2.4 routes headlessly (113/115 edges in 11 seconds, push-and-shove, 45°), the SES imports back, and scripted post-passes added 12 GND stitching vias, one B-layer route, and net bindings for **all five exposed pads, which the netlist had left floating** (KiCad names EPs numerically — "15"/"25"/"9" — not "EP"; found only because the EP showed up in a DRC clearance report).
+
+**Solder-pad pairs (user review, 2026-07-15): every documented pad interface now has its ground partner adjacent** — TP2/TP4 (BAT+GND), TP3/TP6 (VOUT+GND), TP1/TP5 (VBACKUP+GND). Previously one shared GND pad sat 36mm from VBACKUP — the guide's "two solder pads" promise was physically false; nobody spans a coin cell across a board.
 
 Current DRC: **0 shorts, 0 clearance violations, 0 crossings**; 13 unconnected items + 3 starved thermals remain — four hand-finish items in pcbnew: the two U2 escapes Freerouting also gave up on (LED_BAT_B, RTC_SCL — nudge an adjacent track one lane), a short strap for Q2's thermal pad (VBAT), and one GND spoke inside the U2 ring. **Not fab-ready until those close and a human reviews the converter loop.** My own grid router (hardware/router.py) remains as the obstacle/legality library the post-passes are built on.
 

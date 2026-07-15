@@ -39,25 +39,25 @@ COMPONENTS = {
    '14':('PB2/LED_PWR_A','LED_PWR_A'), '15':('PB1/SDA','SDA'), '16':('PB0/SCL','SCL'),
    '17':('PC0/RTC_SDA','RTC_SDA'), '18':('PC1/RTC_SCL','RTC_SCL'), '19':('PC2/BUTTON','BUTTON'),
    '20':('PC3/Q1_GATE_DRV','Q1_GATE_DRV'), '21':('PC4/CHG_CE','CHG_CE'), '22':('PC5','NC'),
-   '23':('PA0/UPDI','UPDI'), '24':('PA1','NC'), 'EP':('PAD','GND')}),
+   '23':('PA0/UPDI','UPDI'), '24':('PA1','NC'), '25':('PAD','GND')}),
  'U3': ('TPS63020DSJR', 'Package_SON:VSON-14-1EP_3x4.45mm_P0.65mm_EP1.6x4.2mm', 'C15483', {
    '1':('VINA','VSYS'), '2':('GND','GND'), '3':('FB','FB'), '4':('VOUT','VOUT'),
    '5':('VOUT','VOUT'), '6':('L2','L2'), '7':('L2','L2'), '8':('L1','L1N'),
    '9':('L1','L1N'), '10':('VIN','VSYS'), '11':('VIN','VSYS'), '12':('EN','CONV_EN'),
-   '13':('PS/SYNC','GND'), '14':('PG','NC'), 'EP':('PGND','GND')}),
+   '13':('PS/SYNC','GND'), '14':('PG','NC'), '15':('PGND','GND')}),
  'U4': ('TP4056', 'Package_SO:SOIC-8-1EP_3.9x4.9mm_P1.27mm_EP2.29x3mm', 'C382139', {
    '1':('TEMP','GND'), '2':('PROG','PROG'), '3':('GND','GND'), '4':('VCC','VBUS'),
    '5':('BAT','VBAT'), '6':('STDBY','CHG_STDBY'), '7':('CHRG','CHG_CHRG'),
-   '8':('CE','CHG_CE'), 'EP':('PAD','GND')}),
+   '8':('CE','CHG_CE'), '9':('PAD','GND')}),
  'U5': ('XC6206P332MR', FP['SOT'], 'C5446', {   # pin order = convention, VERIFY
    '1':('VSS','GND'), '2':('VOUT','3V3'), '3':('VIN','VSYS')}),
  # --- FETs ---
  'Q1': ('AON7407', 'Package_DFN_QFN:DFN-8-1EP_3x3mm_P0.65mm_EP1.6x2.56mm', 'C176756', {
    '1':('S','VSYS'), '2':('S','VSYS'), '3':('S','VSYS'), '4':('G','Q1_GATE'),
-   '5':('D','VBUS'), '6':('D','VBUS'), '7':('D','VBUS'), '8':('D','VBUS'), 'EP':('D','VBUS')}),
+   '5':('D','VBUS'), '6':('D','VBUS'), '7':('D','VBUS'), '8':('D','VBUS'), '9':('D','VBUS')}),
  'Q2': ('AON7407', 'Package_DFN_QFN:DFN-8-1EP_3x3mm_P0.65mm_EP1.6x2.56mm', 'C176756', {
    '1':('S','VSYS'), '2':('S','VSYS'), '3':('S','VSYS'), '4':('G','VBUS'),
-   '5':('D','VBAT'), '6':('D','VBAT'), '7':('D','VBAT'), '8':('D','VBAT'), 'EP':('D','VBAT')}),
+   '5':('D','VBAT'), '6':('D','VBAT'), '7':('D','VBAT'), '8':('D','VBAT'), '9':('D','VBAT')}),
  'Q3': ('BSS138', FP['SOT'], 'C52895', {         # pin order = convention, VERIFY
    '1':('G','Q1_GATE_DRV'), '2':('S','GND'), '3':('D','Q3_DRAIN')}),
  # --- diodes / LEDs / crystal ---
@@ -97,6 +97,8 @@ COMPONENTS = {
  'TP2':('BAT_PAD',     FP['TP'], None, {'1':('P','VBAT')}),
  'TP3':('VOUT_PAD',    FP['TP'], None, {'1':('P','VOUT')}),
  'TP4':('GND_PAD',     FP['TP'], None, {'1':('P','GND')}),
+ 'TP5':('VBACKUP_GND_PAD', FP['TP'], None, {'1':('P','GND')}),
+ 'TP6':('VOUT_GND_PAD',    FP['TP'], None, {'1':('P','GND')}),
 }
 def R(val,a,b,fp='R04'): return (val, FP[fp], None, {'1':('1',a),'2':('2',b)})
 def C(val,a,b,fp='C04'): return (val, FP[fp], None, {'1':('1',a),'2':('2',b)})

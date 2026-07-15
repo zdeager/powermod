@@ -75,7 +75,7 @@ Sources of truth: `powermod-spec.md` §Pre-BOM electrical walk (the net map this
 | SW1 | Tactile switch, SMD | 1 | ~$0.02 | The button |
 | D1, D2 | **Bicolor LED, red/green only** | 2 | ~$0.04 | **Blue/white (Vf≈3V) have no headroom on a 3.3V rail** — this is a requirement, not a preference |
 | — | UPDI: 3 pads or 1×3 header | 1 | ~$0.02 | Field firmware updates |
-| — | VBACKUP + BAT/GND/VOUT solder pads; JP1 (backup charge) + JP2 (5V/3.3V) solder jumpers — **both ship open** | — | $0 | Copper |
+| — | **Paired** solder pads — BAT+GND, VOUT+GND, VBACKUP+GND (each interface with its ground adjacent); JP1 (backup charge) + JP2 (5V/3.3V) solder jumpers — **both ship open** | — | $0 | Copper |
 
 **Connector subtotal: ≈ $0.38**
 
