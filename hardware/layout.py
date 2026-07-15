@@ -101,7 +101,7 @@ FLOORPLAN.update({
 # right-side decompression: everything from x>=42.5 shifts +2 (SCL corridor fix)
 FLOORPLAN={r:((x+2.0 if x>=42.5 else x),y,rot) for r,(x,y,rot) in FLOORPLAN.items()}
 # post-shift absolute positions (bottom-edge J4 shuffle)
-FLOORPLAN.update({'SW1':(54.3,24.0,0),'TP1':(55.0,27.6,0),'TP5':(55.0,30.6,0)})
+FLOORPLAN.update({'SW1':(54.2,20.5,90),'TP1':(55.4,29.8,0),'TP5':(55.4,32.8,0)})
 HOLES = [(3.2,3.2),(BOARD_W-3.2,3.2),(3.2,BOARD_H-3.2),(BOARD_W-3.2,BOARD_H-3.2)]
 
 # ------------------------------------------------------------- s-expr helpers
