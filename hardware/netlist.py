@@ -1,0 +1,242 @@
+#!/usr/bin/env python3
+"""PowerMOD — machine netlist, transcribed from ../powermod-schematic.md.
+
+Single source of truth for generated KiCad artifacts:
+  powermod.net        KiCad S-expression netlist (pcbnew: File > Import Netlist)
+  powermod.kicad_sch  KiCad 7 schematic, global-label style (connectivity by
+                      net labels on every pin; no drawn wires). Open, annotate
+                      is already done, run ERC there — kicad-cli was not
+                      available where this was generated.
+
+Every (ref, pin, net) below is transcribed from powermod-schematic.md, whose
+pin numbers were themselves extracted from datasheets. Footprint fields are
+best-effort standard-library names — verify each in KiCad's footprint browser
+before layout (checklist item 9).
+"""
+import uuid, sys, os
+
+# ---------------------------------------------------------------- components
+# ref: (value, footprint_besteffort, lcsc, {pin: (pinname, net)})
+# net "NC" = deliberately unconnected (emitted as no-connect in the sch).
+FP = {
+  'R04':'Resistor_SMD:R_0402_1005Metric', 'R06':'Resistor_SMD:R_0603_1608Metric',
+  'C04':'Capacitor_SMD:C_0402_1005Metric','C06':'Capacitor_SMD:C_0603_1608Metric',
+  'C08':'Capacitor_SMD:C_0805_2012Metric','SOT':'Package_TO_SOT_SMD:SOT-23',
+  'SOD':'Diode_SMD:D_SOD-323','TP':'TestPoint:TestPoint_Pad_2.0x2.0mm',
+  'SJ':'Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm',
+}
+COMPONENTS = {
+ # --- ICs ---
+ 'U1': ('BM8563', 'Package_SO:SOIC-8_3.9x4.9mm_P1.27mm', 'C194063', {
+   '1':('OSCI','OSCI'), '2':('OSCO','OSCO'), '3':('INT','RTC_INT'), '4':('VSS','GND'),
+   '5':('SDA','RTC_SDA'), '6':('SCL','RTC_SCL'), '7':('CLKOUT','NC'), '8':('VDD','RTC_VDD')}),
+ 'U2': ('ATtiny1617', 'Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm', 'C614176', {
+   '1':('PA2/RTC_INT','RTC_INT'), '2':('PA3/CONV_EN','CONV_EN'), '3':('GND','GND'),
+   '4':('VDD','3V3'), '5':('PA4/VBAT_SENSE','VBAT_DIV'), '6':('PA5/VBUS_SENSE','VBUS_DIV'),
+   '7':('PA6','NC'), '8':('PA7','NC'), '9':('PB7/LED_BAT_B','LED_BAT_B'),
+   '10':('PB6/LED_BAT_A','LED_BAT_A'), '11':('PB5/CHG_STDBY','CHG_STDBY'),
+   '12':('PB4/CHG_CHRG','CHG_CHRG'), '13':('PB3/LED_PWR_B','LED_PWR_B'),
+   '14':('PB2/LED_PWR_A','LED_PWR_A'), '15':('PB1/SDA','SDA'), '16':('PB0/SCL','SCL'),
+   '17':('PC0/RTC_SDA','RTC_SDA'), '18':('PC1/RTC_SCL','RTC_SCL'), '19':('PC2/BUTTON','BUTTON'),
+   '20':('PC3/Q1_GATE_DRV','Q1_GATE_DRV'), '21':('PC4/CHG_CE','CHG_CE'), '22':('PC5','NC'),
+   '23':('PA0/UPDI','UPDI'), '24':('PA1','NC'), 'EP':('PAD','GND')}),
+ 'U3': ('TPS63020DSJR', 'Package_SON:VSON-14-1EP_3.5x3.5mm_P0.5mm', 'C15483', {
+   '1':('VINA','VSYS'), '2':('GND','GND'), '3':('FB','FB'), '4':('VOUT','VOUT'),
+   '5':('VOUT','VOUT'), '6':('L2','L2'), '7':('L2','L2'), '8':('L1','L1N'),
+   '9':('L1','L1N'), '10':('VIN','VSYS'), '11':('VIN','VSYS'), '12':('EN','CONV_EN'),
+   '13':('PS/SYNC','GND'), '14':('PG','NC'), 'EP':('PGND','GND')}),
+ 'U4': ('TP4056', 'Package_SO:SOIC-8-1EP_3.9x4.9mm_P1.27mm_EP2.29x2.29mm', 'C382139', {
+   '1':('TEMP','GND'), '2':('PROG','PROG'), '3':('GND','GND'), '4':('VCC','VBUS'),
+   '5':('BAT','VBAT'), '6':('STDBY','CHG_STDBY'), '7':('CHRG','CHG_CHRG'),
+   '8':('CE','CHG_CE'), 'EP':('PAD','GND')}),
+ 'U5': ('XC6206P332MR', FP['SOT'], 'C5446', {   # pin order = convention, VERIFY
+   '1':('VSS','GND'), '2':('VOUT','3V3'), '3':('VIN','VSYS')}),
+ # --- FETs ---
+ 'Q1': ('AON7407', 'Package_DFN_QFN:DFN-8-1EP_3x3mm_P0.65mm', 'C176756', {
+   '1':('S','VSYS'), '2':('S','VSYS'), '3':('S','VSYS'), '4':('G','Q1_GATE'),
+   '5':('D','VBUS'), '6':('D','VBUS'), '7':('D','VBUS'), '8':('D','VBUS'), 'EP':('D','VBUS')}),
+ 'Q2': ('AON7407', 'Package_DFN_QFN:DFN-8-1EP_3x3mm_P0.65mm', 'C176756', {
+   '1':('S','VSYS'), '2':('S','VSYS'), '3':('S','VSYS'), '4':('G','VBUS'),
+   '5':('D','VBAT'), '6':('D','VBAT'), '7':('D','VBAT'), '8':('D','VBAT'), 'EP':('D','VBAT')}),
+ 'Q3': ('BSS138', FP['SOT'], 'C52895', {         # pin order = convention, VERIFY
+   '1':('G','Q1_GATE_DRV'), '2':('S','GND'), '3':('D','Q3_DRAIN')}),
+ # --- diodes / LEDs / crystal ---
+ 'D1': ('LED_RG_CC', 'LED_SMD:LED_LTST-C155GEKT', None, {  # pin order VERIFY vs part
+   '1':('A_RED','D1_RED'), '2':('K','GND'), '3':('A_GRN','D1_GRN')}),
+ 'D2': ('LED_RG_CC', 'LED_SMD:LED_LTST-C155GEKT', None, {
+   '1':('A_RED','D2_RED'), '2':('K','GND'), '3':('A_GRN','D2_GRN')}),
+ 'D3': ('1N4148WS', FP['SOD'], None, {'1':('K','RTC_VDD'), '2':('A','3V3')}),
+ 'D4': ('1N4148WS', FP['SOD'], None, {'1':('K','RTC_VDD'), '2':('A','VBACKUP')}),
+ 'Y1': ('32.768kHz', 'Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm', None, {
+   '1':('X1','OSCI'), '2':('X2','OSCO')}),
+ # --- connectors / electromech ---
+ 'J1': ('USB_C_IN', 'Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12', None, {
+   'A1':('GND','GND'),'B1':('GND','GND'),'A12':('GND','GND'),'B12':('GND','GND'),
+   'A4':('VBUS','VBUS'),'B4':('VBUS','VBUS'),'A9':('VBUS','VBUS'),'B9':('VBUS','VBUS'),
+   'A5':('CC1','CC1_IN'),'B5':('CC2','CC2_IN'),
+   'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'S1':('SHIELD','GND')}),
+ 'J2': ('USB_C_OUT', 'Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12', None, {
+   'A1':('GND','GND'),'B1':('GND','GND'),'A12':('GND','GND'),'B12':('GND','GND'),
+   'A4':('VBUS','VOUT'),'B4':('VBUS','VOUT'),'A9':('VBUS','VOUT'),'B9':('VBUS','VOUT'),
+   'A5':('CC1','CC1_OUT'),'B5':('CC2','CC2_OUT'),
+   'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'S1':('SHIELD','GND')}),
+ 'J3': ('JST_PH_2', 'Connector_JST:JST_PH_S2B-PH-K_1x02_P2.00mm_Horizontal', None, {
+   '1':('BAT+','VBAT'), '2':('BAT-','GND')}),
+ 'J4': ('STEMMA_QT', 'Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal', None, {
+   '1':('GND','GND'), '2':('VCC_NC','NC'), '3':('SDA','SDA'), '4':('SCL','SCL')}),
+ 'J5': ('UPDI_HDR', 'Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical', None, {
+   '1':('UPDI','UPDI'), '2':('3V3','3V3'), '3':('GND','GND')}),
+ 'SW1':('BUTTON', 'Button_Switch_SMD:SW_SPST_PTS645', None, {
+   '1':('A','BUTTON'), '2':('B','GND')}),
+ 'JP1':('CHG_JUMPER', FP['SJ'], None, {'1':('A','CHG_JP'), '2':('B','VBACKUP')}),
+ 'JP2':('VSEL_JUMPER', FP['SJ'], None, {'1':('A','FB_MID'), '2':('B','VOUT')}),
+ 'L1': ('1.5uH_4.5A', 'Inductor_SMD:L_Sumida_CDMC6D28', None, {  # footprint per chosen part
+   '1':('1','L1N'), '2':('2','L2')}),
+ # --- test pads ---
+ 'TP1':('VBACKUP_PAD', FP['TP'], None, {'1':('P','VBACKUP')}),
+ 'TP2':('BAT_PAD',     FP['TP'], None, {'1':('P','VBAT')}),
+ 'TP3':('VOUT_PAD',    FP['TP'], None, {'1':('P','VOUT')}),
+ 'TP4':('GND_PAD',     FP['TP'], None, {'1':('P','GND')}),
+}
+def R(val,a,b,fp='R04'): return (val, FP[fp], None, {'1':('1',a),'2':('2',b)})
+def C(val,a,b,fp='C04'): return (val, FP[fp], None, {'1':('1',a),'2':('2',b)})
+COMPONENTS.update({
+ 'R1': R('1.2k','PROG','GND'),          # TP4056 1A
+ 'R2': R('5.1k','CC1_IN','GND'),  'R3': R('5.1k','CC2_IN','GND'),
+ 'R4': R('56k','CC1_OUT','VOUT'), 'R5': R('56k','CC2_OUT','VOUT'),
+ 'R6': R('1M','VBAT','VBAT_DIV'), 'R7': R('330k','VBAT_DIV','GND'),
+ 'R8': R('1M','VBUS','VBUS_DIV'), 'R9': R('330k','VBUS_DIV','GND'),
+ 'R10':R('100k','VSYS','Q1_GATE'),      # Q1 pull-up
+ 'R11':R('47k','Q1_GATE','Q3_DRAIN'),   # gate series
+ 'R12':R('100k','VBUS','GND'),          # Q2 gate pulldown (gate tied to VBUS)
+ 'R13':R('100k','Q1_GATE_DRV','GND'),   # Q3 gate pulldown
+ 'R14':R('100k','CONV_EN','GND'),       # EN defined during MCU reset
+ 'R15':R('10k','3V3','CHG_CHRG'), 'R16':R('10k','3V3','CHG_STDBY'),
+ 'R17':R('10k','3V3','RTC_SDA'),  'R18':R('10k','3V3','RTC_SCL'),
+ 'R19':R('10k','3V3','RTC_INT'),        # to 3V3, NOT VBACKUP (claims row 39)
+ 'R20':R('560','LED_PWR_A','D1_RED'), 'R21':R('560','LED_PWR_B','D1_GRN'),
+ 'R22':R('560','LED_BAT_A','D2_RED'), 'R23':R('560','LED_BAT_B','D2_GRN'),
+ 'R24':R('180k','FB','GND'), 'R25':R('1M','FB','FB_MID'), 'R26':R('620k','FB_MID','VOUT'),
+ 'R27':R('1k','3V3','CHG_JP'),          # supercap charge, behind JP1
+ 'C1': C('10u','VSYS','GND','C08'),  'C2': C('10u','VSYS','GND','C08'),
+ 'C3': C('22u','VOUT','GND','C08'),  'C4': C('22u','VOUT','GND','C08'),
+ 'C5': C('22u','VOUT','GND','C08'),
+ 'C6': C('4.7u','VBAT','GND','C06'), 'C7': C('10u','VBUS','GND','C08'),
+ 'C8': C('1u','VSYS','GND','C06'),   'C9': C('1u','3V3','GND','C06'),
+ 'C10':C('100n','VBAT_DIV','GND'),   'C11':C('100n','VBUS_DIV','GND'),
+ 'C12':C('100n','VSYS','Q1_GATE'),   # Q1 gate-source
+ 'C13':C('100n','RTC_VDD','GND'), 'C14':C('100n','3V3','GND'), 'C15':C('100n','VBUS','GND'),
+ 'C16':C('100n','VSYS','GND'),       # VINA decoupling — TI ref design (found at transcription)
+})
+
+# ------------------------------------------------------------------ validate
+def build_nets():
+    nets={}
+    for ref,(val,fp,lcsc,pins) in COMPONENTS.items():
+        for pin,(pname,net) in pins.items():
+            nets.setdefault(net,[]).append((ref,pin))
+    return nets
+
+def validate():
+    nets=build_nets(); errs=[]
+    # non-NC nets must have >=2 nodes
+    for net,nodes in nets.items():
+        if net!='NC' and len(nodes)<2: errs.append(f"singleton net {net}: {nodes}")
+    # board-killer golden facts (from powermod-schematic.md §3 checklist)
+    G=[('Q1','1','VSYS'),('Q1','4','Q1_GATE'),('Q1','5','VBUS'),
+       ('Q2','1','VSYS'),('Q2','4','VBUS'),('Q2','5','VBAT'),
+       ('U4','1','GND'),('U3','13','GND'),('U3','12','CONV_EN'),
+       ('U1','3','RTC_INT'),('U2','23','UPDI'),('U2','15','SDA'),('U2','16','SCL'),
+       ('J4','2','NC'),('D3','2','3V3'),('D4','2','VBACKUP'),
+       ('D3','1','RTC_VDD'),('D4','1','RTC_VDD')]
+    for ref,pin,net in G:
+        got=COMPONENTS[ref][3][pin][1]
+        if got!=net: errs.append(f"GOLDEN FAIL {ref}.{pin}: {got} != {net}")
+    # INT pull-up rail
+    if COMPONENTS['R19'][3]['1'][1]!='3V3': errs.append("R19 not to 3V3")
+    # pin-count sanity
+    expect={'U1':8,'U2':25,'U3':15,'U4':9,'U5':3,'Q1':9,'Q2':9,'Q3':3}
+    for ref,npins in expect.items():
+        if len(COMPONENTS[ref][3])!=npins: errs.append(f"{ref} pin count {len(COMPONENTS[ref][3])}!={npins}")
+    return nets, errs
+
+# ---------------------------------------------------------------- generators
+def u(): return str(uuid.uuid4())
+
+def gen_net(path):
+    nets,_=validate()
+    out=['(export (version "E")\n (components']
+    for ref,(val,fp,lcsc,_) in sorted(COMPONENTS.items()):
+        f=f'\n   (fields (field (name "LCSC") "{lcsc}"))' if lcsc else ''
+        out.append(f'  (comp (ref "{ref}") (value "{val}") (footprint "{fp}"){f})')
+    out.append(' )\n (nets')
+    code=1
+    for net,nodes in sorted(nets.items()):
+        if net=='NC': continue
+        ns=''.join(f'\n   (node (ref "{r}") (pin "{p}"))' for r,p in sorted(nodes))
+        out.append(f'  (net (code "{code}") (name "{net}"){ns})'); code+=1
+    out.append(' ))')
+    open(path,'w').write('\n'.join(out))
+    return code-1
+
+def gen_sch(path):
+    """KiCad 7 schematic: one symbol per component, global label on every pin."""
+    nets,_=validate()
+    PITCH=2.54
+    lib={}; inst=[]; labels=[]; nc=[]
+    for ref,(val,fp,lcsc,pins) in sorted(COMPONENTS.items()):
+        name=f"PM_{ref}"
+        keys=list(pins.keys()); nleft=(len(keys)+1)//2
+        half=6.35 if len(keys)>2 else 3.81
+        pdefs=[]; coords={}
+        for i,pin in enumerate(keys):
+            side=0 if i<nleft else 1
+            row=i if side==0 else i-nleft
+            px=-half if side==0 else half
+            py=(nleft-1)*PITCH/2 - row*PITCH
+            ang=0 if side==0 else 180
+            pdefs.append(f'(pin passive line (at {px-2.54 if side==0 else px+2.54} {py} {ang}) (length 2.54)'
+                         f' (name "{pins[pin][0]}" (effects (font (size 1.0 1.0))))'
+                         f' (number "{pin}" (effects (font (size 1.0 1.0)))))')
+            coords[pin]=(px-2.54 if side==0 else px+2.54, py)
+        h=max(nleft,len(keys)-nleft)*PITCH/2+1.27
+        lib[name]=(f'(symbol "{name}" (pin_numbers hide) (in_bom yes) (on_board yes)\n'
+          f' (property "Reference" "{ref[0]}" (at 0 {h+2.54} 0) (effects (font (size 1.27 1.27))))\n'
+          f' (property "Value" "{val}" (at 0 {-h-2.54} 0) (effects (font (size 1.27 1.27))))\n'
+          f' (symbol "{name}_1_1" (rectangle (start {-half} {h}) (end {half} {-h})'
+          f' (stroke (width 0.15) (type default)) (fill (type background)))\n  '
+          +'\n  '.join(pdefs)+'))', coords)
+    # place instances on a grid
+    x0,y0,dx,dy,percol=30,30,72,66,7
+    body=[]
+    for i,(ref,(val,fp,lcsc,pins)) in enumerate(sorted(COMPONENTS.items())):
+        X=x0+(i//percol)*dx; Y=y0+(i%percol)*dy
+        name=f"PM_{ref}"; _,coords=lib[name]
+        props=(f'(property "Reference" "{ref}" (at {X} {Y-14} 0) (effects (font (size 1.27 1.27))))\n'
+               f'  (property "Value" "{val}" (at {X} {Y+14} 0) (effects (font (size 1.27 1.27))))\n'
+               f'  (property "Footprint" "{fp}" (at {X} {Y} 0) (effects (font (size 1.27 1.27)) hide))')
+        pininst='\n  '.join(f'(pin "{p}" (uuid {u()}))' for p in pins)
+        body.append(f'(symbol (lib_id "powermod:{name}") (at {X} {Y} 0) (unit 1)'
+                    f' (in_bom yes) (on_board yes) (uuid {u()})\n  {props}\n  {pininst})')
+        for p,(pname,net) in pins.items():
+            cx,cy=coords[p]; ax,ay=X+cx,Y-cy
+            if net=='NC':
+                nc.append(f'(no_connect (at {ax} {ay}) (uuid {u()}))')
+            else:
+                labels.append(f'(global_label "{net}" (shape passive) (at {ax} {ay} 0)'
+                              f' (effects (font (size 1.0 1.0)) (justify left)) (uuid {u()}))')
+    sch=('(kicad_sch (version 20230121) (generator powermod_netlist_py)\n'
+         f' (uuid {u()})\n (paper "A2")\n'
+         ' (title_block (title "PowerMOD") (rev "1") (comment 1 "GENERATED from netlist.py — source of truth is powermod-schematic.md"))\n'
+         ' (lib_symbols\n  '+'\n  '.join(v[0] for v in lib.values())+'\n )\n '
+         +'\n '.join(body)+'\n '+'\n '.join(labels)+'\n '+'\n '.join(nc)+'\n)')
+    open(path,'w').write(sch)
+
+if __name__=='__main__':
+    nets,errs=validate()
+    if errs:
+        print("VALIDATION FAILED:"); [print(" ",e) for e in errs]; sys.exit(1)
+    ncount=gen_net(os.path.join(os.path.dirname(__file__) or '.','powermod.net'))
+    gen_sch(os.path.join(os.path.dirname(__file__) or '.','powermod.kicad_sch'))
+    npins=sum(len(c[3]) for c in COMPONENTS.values())
+    print(f"OK: {len(COMPONENTS)} components, {npins} pins, {ncount} nets -> powermod.net, powermod.kicad_sch")

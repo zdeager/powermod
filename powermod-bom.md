@@ -41,7 +41,7 @@ Sources of truth: `powermod-spec.md` §Pre-BOM electrical walk (the net map this
 | C-ldo | 1µF | 0402/0603 | 2 | ~$0.01 | XC6206 in/out |
 | C-adc | 100nF | 0402 | 2 | ~$0.005 | Divider sampling reservoirs (VBAT, VBUS) |
 | C-gate | 100nF | 0402 | 1 | ~$0.005 | Q1 gate-source (τ ≈ 5ms with R-gate) |
-| C-vdd | 100nF | 0402 | 3 | ~$0.005 | Decoupling: U1, U2, U4 |
+| C-vdd | 100nF | 0402 | 4 | ~$0.005 | Decoupling: U1, U2, U4, **U3 `VINA` (TI ref design — added at KiCad transcription)** |
 | **Y1** | **32.768 kHz crystal**, CL per U1 (one oscillator cap is on-die — confirm CL split at layout) | 3215 | 1 | ~$0.08 | **New with the RTC reversal.** Guard-ring the layout |
 | **D3, D4** | **1N4148WS** (silicon, nA leakage — deliberately not Schottky) | SOD-323 | 2 | ~$0.01 | RTC VDD diode-OR: D3←3V3, D4←backup pads. Legal per claims row 41 |
 | **R-chg + JP1** | 1kΩ + solder jumper, **open by default** | 0402 | 1 | ~$0.002 | Supercap charge path. Open = coin-cell-safe; no register can close it |

@@ -4,6 +4,8 @@ Last updated: 2026-07-15
 Status: **Complete pin-for-pin connectivity, ready for capture in any EDA tool.** This document *is* the schematic's source of truth; the EDA file transcribes it. Every IC pin number below is read from the part's datasheet (extraction noted per part); two jellybean pinouts are flagged as convention-verify-at-capture.
 Sources: `powermod-spec.md` §Pre-BOM electrical walk (net map), `powermod-bom.md` (refs and values).
 
+**Machine transcription: `hardware/netlist.py`** — the same connectivity as a Python data structure, with a validator (golden board-killer facts, pin counts, no singleton nets) and generators for `hardware/powermod.net` (import into pcbnew for layout) and `hardware/powermod.kicad_sch` (global-label-style schematic; run ERC on open — no kicad-cli was available where these were generated, so KiCad itself is the final parser check).
+
 ## 0. Pinout provenance
 
 | Part | Pinout basis |
@@ -83,7 +85,7 @@ Body-diode orientation check (capture-time ERC): Q1 body diode conducts VBUS→V
 ### 2.5 Converter — TPS63020 (U3)
 | Pin | Net |
 |---|---|
-| 1 VINA | VSYS |
+| 1 VINA | VSYS **+ C16 100nF → GND** (TI reference design decouples VINA separately — found during KiCad transcription; the doc originally had it bare) |
 | 2 GND | GND |
 | 3 FB | `FB`: R-fb-low 180kΩ → GND; R-fb-hi-a 1MΩ → node `FB_MID` → R-fb-hi-b 620kΩ → **VOUT**; **JP2 solder jumper across R-fb-hi-b** |
 | 4-5 VOUT | **VOUT** (+ 3× 22µF → GND) |

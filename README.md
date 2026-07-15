@@ -14,6 +14,7 @@ A generic power scheduler, UPS, and battery supply for I2C-capable hosts — Lin
 | [powermod-schematic.md](powermod-schematic.md) | Pin-exact netlist — every component pin to every net, MCU pin assignment, capture-time checklist. The EDA schematic transcribes this |
 | [powermod-bom.md](powermod-bom.md) | Bill of materials — LCSC part numbers, verified prices, do-not-substitute notes, sourcing flags |
 | [powermod_full_state_machine.svg](powermod_full_state_machine.svg) | Power state machine — all states, transitions, and gating rules |
+| [hardware/](hardware/) | KiCad transcription — `netlist.py` (machine source of truth + validator) generates `powermod.net` (pcbnew import) and `powermod.kicad_sch` |
 
 ## Open items (all require hardware)
 
