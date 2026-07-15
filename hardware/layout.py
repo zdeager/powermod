@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(__file__) or '.')
 from netlist import COMPONENTS, build_nets
 
 KISHARE = "/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints"
-BOARD_W, BOARD_H = 56.0, 40.0   # mm (compacted from 62x46 after pad-pair review)
+BOARD_W, BOARD_H = 58.0, 40.0   # mm (56 sealed the SCL corridor with a pad wall; +2mm on the right reopens it)
 
 # ref: (x, y, rot)  — origin top-left of board; y down. Edited under DRC.
 FLOORPLAN = {
@@ -96,6 +96,8 @@ FLOORPLAN.update({
  'TP1': (53.0, 29.4, 0), 'TP5': (53.0, 32.5, 0),
  'TP6': (41.0, 37.2, 0),
 })
+# right-side decompression: everything from x>=42.5 shifts +2 (SCL corridor fix)
+FLOORPLAN={r:((x+2.0 if x>=42.5 else x),y,rot) for r,(x,y,rot) in FLOORPLAN.items()}
 HOLES = [(3.2,3.2),(BOARD_W-3.2,3.2),(3.2,BOARD_H-3.2),(BOARD_W-3.2,BOARD_H-3.2)]
 
 # ------------------------------------------------------------- s-expr helpers
