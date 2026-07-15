@@ -67,6 +67,8 @@ def parse_pads():
             ay=fy - px*si + py*c
             layers=ly.group(1)
             through='*.Cu' in layers or 'thru' in pb
+            if not through and 'F.Cu' not in layers and 'B.Cu' not in layers:
+                continue   # paste/mask-only aperture: no copper, not an obstacle
             pads.append((nm.group(1) if nm else '', ax, ay, sx/2, sy/2,
                          'BOTH' if through else ('F' if 'F.Cu' in layers else 'B'), fpid))
     return pads
@@ -193,7 +195,7 @@ def route_edge(obs,net,w,p1,p2,allow_b=True):
             m=(x,y,other); ng=g+40
             if m not in came and best.get(m,1e18)>ng:
                 fx,fy=gf(x),gf(y)
-                if (not obs.blocked(net,w,other,fx,fy,exempt)
+                if (not obs.blocked(net,VIA_SIZE,other,fx,fy,exempt)
                         and not obs.blocked(net,VIA_SIZE,ly,fx,fy,exempt)):
                     best[m]=ng; heapq.heappush(openq,(ng+h(m),ng,m,n))
     if not seen_target: return None
