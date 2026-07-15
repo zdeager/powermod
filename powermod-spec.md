@@ -1,7 +1,7 @@
 # PowerMOD — Generic Power Scheduler / UPS / Battery Supply — Spec
 
 Last updated: 2026-07-15
-Status: **Requirements complete. Register map drafted (`powermod-register-map.md`, protocol v1). Parts selected and datasheet-verified. BOM drafted (`powermod-bom.md`, **≈$2.90** @100–150 after the RTC reversal). Ready for schematic + firmware.**
+Status: **Requirements complete. Register map drafted (`powermod-register-map.md`, protocol v1). Parts selected and datasheet-verified. Schematic netlist complete (`powermod-schematic.md` — pin-exact, validated). BOM drafted (`powermod-bom.md`, **≈$2.90** @100–150 after the RTC reversal). Ready for schematic + firmware.**
 Remaining before hardware: buck-boost efficiency and the final output figures (close by measuring, not reading), bench validation of the `CE` battery-detect, and the schematic-level confirmations flagged throughout. **Every IC and FET is now selected and datasheet-verified** — see the design at a glance.
 
 ## Revision note — 2026-07-15 audit
