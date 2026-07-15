@@ -4,3 +4,7 @@ hardware/*.lck
 hardware/*-backups/
 hardware/freerouting.jar
 hardware/drc_*.rpt
+hardware/*.dsn
+hardware/*.ses
+hardware/*.kicad_prl
+hardware/from_kicad.net
