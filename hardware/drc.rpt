@@ -1,249 +1,25 @@
 ** Drc report for powermod.kicad_pcb **
-** Created on 2026-07-15T20:45:58 **
+** Created on 2026-07-15T21:02:38 **
 ** Report includes: Errors **
 
-** Found 49 DRC violations **
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1480 mm)
+** Found 3 DRC violations **
+[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
     Local override; error
-    @(9.0450 mm, 35.7500 mm): Track [CC2_OUT] on F.Cu, length 1.0000 mm
-    @(10.7500 mm, 35.2500 mm): Track [VOUT] on F.Cu, length 0.2500 mm
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.0750 mm)
-    Local override; error
-    @(10.2500 mm, 13.7500 mm): Via [CC2_IN] on F.Cu - B.Cu
-    @(10.0000 mm, 14.2500 mm): Track [VBUS] on F.Cu, length 1.0000 mm
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1370 mm)
-    Local override; error
-    @(40.5000 mm, 10.7500 mm): Via [VBUS_DIV] on F.Cu - B.Cu
-    @(41.2500 mm, 10.5000 mm): Track [RTC_INT] on F.Cu, length 0.3128 mm
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1342 mm)
-    Local override; error
-    @(45.7500 mm, 13.2500 mm): Via [LED_PWR_B] on F.Cu - B.Cu
-    @(45.9380 mm, 12.7500 mm): Track [LED_PWR_A] on F.Cu, length 1.0000 mm
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1415 mm)
-    Local override; error
-    @(47.5000 mm, 29.7500 mm): Track [LED_PWR_B] on F.Cu, length 2.7500 mm
-    @(52.8500 mm, 20.5000 mm): Pad 1 [CHG_JP] of JP1 on F.Cu
-[shorting_items]: Items shorting two nets (nets LED_PWR_B and FB_MID)
-    Local override; error
-    @(47.5000 mm, 27.0000 mm): Via [LED_PWR_B] on F.Cu - B.Cu
-    @(52.8500 mm, 20.5000 mm): Pad 1 [CHG_JP] of JP1 on F.Cu
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1092 mm)
-    Local override; error
-    @(46.7500 mm, 11.2500 mm): Via [RTC_SDA] on F.Cu - B.Cu
-    @(46.9380 mm, 10.7500 mm): Track [RTC_SCL] on F.Cu, length 0.0620 mm
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1800 mm)
-    Local override; error
-    @(10.2500 mm, 12.7500 mm): Via [CC1_IN] on F.Cu - B.Cu
-    @(9.0450 mm, 34.7500 mm): Pad B6 [<no net>] of J2 on F.Cu
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1340 mm)
-    Local override; error
-    @(44.7500 mm, 8.5000 mm): Via [Q1_GATE_DRV] on F.Cu - B.Cu
-    @(44.2500 mm, 8.7500 mm): Track [CHG_CE] on F.Cu, length 0.3120 mm
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1014 mm)
-    Local override; error
-    @(25.0000 mm, 21.2500 mm): Via [Q1_GATE_DRV] on F.Cu - B.Cu
-    @(28.7500 mm, 22.0000 mm): Track [VSYS] on F.Cu, length 3.2500 mm
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1000 mm)
-    Local override; error
-    @(42.0620 mm, 12.2500 mm): Track [3V3] on F.Cu, length 1.0000 mm
-    @(41.2500 mm, 12.7500 mm): Via [VBAT_DIV] on F.Cu - B.Cu
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1340 mm)
-    Local override; error
-    @(47.5000 mm, 5.5000 mm): Via [BUTTON] on F.Cu - B.Cu
-    @(48.5000 mm, 6.0000 mm): Track [RTC_VDD] on F.Cu, length 0.7500 mm
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1090 mm)
-    Local override; error
-    @(48.2500 mm, 22.0000 mm): Via [SDA] on F.Cu - B.Cu
-    @(48.7500 mm, 20.7500 mm): Track [CHG_JP] on F.Cu, length 1.0000 mm
-[shorting_items]: Items shorting two nets (nets LED_BAT_B and FB_MID)
-    Local override; error
-    @(46.7500 mm, 22.2500 mm): Track [LED_BAT_B] on F.Cu, length 3.0000 mm
-    @(52.8500 mm, 20.5000 mm): Pad 1 [CHG_JP] of JP1 on F.Cu
-[shorting_items]: Items shorting two nets (nets LED_BAT_B and FB_MID)
-    Local override; error
-    @(46.7500 mm, 25.2500 mm): Track [LED_BAT_B] on F.Cu, length 2.5000 mm
-    @(52.8500 mm, 20.5000 mm): Pad 1 [CHG_JP] of JP1 on F.Cu
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1310 mm)
-    Local override; error
-    @(46.2500 mm, 26.7500 mm): Track [LED_PWR_A] on F.Cu, length 0.5000 mm
-    @(52.8500 mm, 20.5000 mm): Pad 1 [CHG_JP] of JP1 on F.Cu
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1310 mm)
-    Local override; error
-    @(46.2500 mm, 30.7500 mm): Track [LED_PWR_A] on F.Cu, length 4.0000 mm
-    @(52.8500 mm, 20.5000 mm): Pad 1 [CHG_JP] of JP1 on F.Cu
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1090 mm)
-    Local override; error
-    @(55.2500 mm, 10.2500 mm): Track [RTC_SDA] on F.Cu, length 0.2500 mm
-    @(56.0000 mm, 10.5000 mm): Via [RTC_SCL] on F.Cu - B.Cu
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1000 mm)
-    Local override; error
-    @(36.4500 mm, 25.2000 mm): Pad 13 [GND] of U3 on F.Cu
-    @(36.5000 mm, 25.7500 mm): Via [CONV_EN] on F.Cu - B.Cu
-[shorting_items]: Items shorting two nets (nets VBACKUP and CHG_JP)
-    Local override; error
-    @(53.2500 mm, 19.7500 mm): Track [VBACKUP] on F.Cu, length 0.5000 mm
-    @(52.8500 mm, 20.5000 mm): Pad 1 [CHG_JP] of JP1 on F.Cu
-[shorting_items]: Items shorting two nets (nets VBACKUP and CHG_JP)
-    Local override; error
-    @(51.2500 mm, 19.7500 mm): Track [VBACKUP] on F.Cu, length 1.7500 mm
-    @(52.8500 mm, 20.5000 mm): Pad 1 [CHG_JP] of JP1 on F.Cu
-[shorting_items]: Items shorting two nets (nets CHG_JP and VBACKUP)
-    Local override; error
-    @(52.8500 mm, 20.5000 mm): Pad 1 [CHG_JP] of JP1 on F.Cu
-    @(53.0000 mm, 19.7500 mm): Track [VBACKUP] on F.Cu, length 0.2500 mm
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.0920 mm)
-    Local override; error
-    @(32.7500 mm, 24.7500 mm): Via [FB] on F.Cu - B.Cu
-    @(33.5500 mm, 24.5500 mm): Pad 1 [VSYS] of U3 on F.Cu
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.0750 mm)
-    Local override; error
-    @(42.2500 mm, 10.2500 mm): Via [RTC_INT] on F.Cu - B.Cu
-    @(42.7500 mm, 10.0625 mm): Pad 24 [<no net>] of U2 on F.Cu
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1900 mm)
-    Local override; error
-    @(37.5000 mm, 9.0200 mm): Pad 2 [GND] of C14 on F.Cu
-    @(38.2500 mm, 9.0000 mm): Track [3V3] on F.Cu, length 0.2500 mm
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1937 mm)
-    Local override; error
-    @(49.5000 mm, 19.9900 mm): Pad 2 [CHG_JP] of R27 on F.Cu
-    @(50.2500 mm, 20.2500 mm): Track [3V3] on F.Cu, length 0.2500 mm
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1937 mm)
-    Local override; error
-    @(40.7500 mm, 15.2500 mm): Track [3V3] on F.Cu, length 0.2500 mm
-    @(40.0000 mm, 14.9900 mm): Pad 2 [CHG_STDBY] of R16 on F.Cu
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1656 mm)
-    Local override; error
-    @(24.4500 mm, 22.4750 mm): Track [VBAT] on F.Cu, length 0.0559 mm
-    @(25.2500 mm, 22.7500 mm): Track [VSYS] on F.Cu, length 0.5000 mm
-[clearance]: Clearance violation ( clearance 0.2000 mm; actual 0.1656 mm)
-    Local override; error
-    @(24.4500 mm, 22.4750 mm): Track [VBAT] on F.Cu, length 0.0559 mm
-    @(25.5000 mm, 22.7500 mm): Track [VSYS] on F.Cu, length 0.2500 mm
-[hole_clearance]: Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.1415 mm)
-    Rule: board setup constraints hole; error
-    @(52.8500 mm, 20.5000 mm): Pad 1 [CHG_JP] of JP1 on F.Cu
-    @(47.5000 mm, 27.0000 mm): Via [LED_PWR_B] on F.Cu - B.Cu
-[hole_clearance]: Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.1415 mm)
-    Rule: board setup constraints hole; error
-    @(54.1500 mm, 20.5000 mm): Pad 2 [VBACKUP] of JP1 on F.Cu
-    @(47.5000 mm, 27.0000 mm): Via [LED_PWR_B] on F.Cu - B.Cu
-[hole_clearance]: Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.2420 mm)
-    Rule: board setup constraints hole; error
-    @(33.5500 mm, 24.5500 mm): Pad 1 [VSYS] of U3 on F.Cu
-    @(32.7500 mm, 24.7500 mm): Via [FB] on F.Cu - B.Cu
-[hole_clearance]: Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.2250 mm)
-    Rule: board setup constraints hole; error
-    @(45.9375 mm, 12.7500 mm): Pad 14 [LED_PWR_A] of U2 on F.Cu
-    @(45.7500 mm, 13.2500 mm): Via [LED_PWR_B] on F.Cu - B.Cu
-[hole_clearance]: Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.2250 mm)
-    Rule: board setup constraints hole; error
-    @(42.7500 mm, 10.0625 mm): Pad 24 [<no net>] of U2 on F.Cu
-    @(42.2500 mm, 10.2500 mm): Via [RTC_INT] on F.Cu - B.Cu
+    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
+    @(42.0625 mm, 11.7500 mm): Pad 3 [GND] of U2 on F.Cu
 [starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
     Local override; error
     @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
     @(9.0450 mm, 30.7500 mm): Pad A1 [GND] of J2 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; error
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(9.0450 mm, 37.2500 mm): Pad A12 [GND] of J2 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; error
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(9.0450 mm, 37.2500 mm): Pad B1 [GND] of J2 on F.Cu
 [starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
     Local override; error
     @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
     @(9.0450 mm, 30.7500 mm): Pad B12 [GND] of J2 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; error
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(12.5000 mm, 9.5200 mm): Pad 2 [GND] of C15 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; error
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(12.5000 mm, 12.9900 mm): Pad 2 [GND] of R12 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; error
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(15.5250 mm, 10.6350 mm): Pad 3 [GND] of U4 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; error
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(23.0000 mm, 13.2250 mm): Pad 2 [GND] of C6 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; error
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(29.5000 mm, 28.0500 mm): Pad 2 [GND] of C2 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; error
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(28.5625 mm, 5.0500 mm): Pad 1 [GND] of U5 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; error
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(33.5000 mm, 8.2250 mm): Pad 2 [GND] of C9 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; error
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(10.0100 mm, 23.2000 mm): Pad 2 [GND] of R9 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; error
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(48.5000 mm, 5.0200 mm): Pad 2 [GND] of C13 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; error
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(55.0000 mm, 34.7500 mm): Pad 2 [GND] of D2 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; error
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(13.0100 mm, 16.0000 mm): Pad 2 [GND] of R2 on F.Cu
 
-** Found 40 unconnected pads **
+** Found 13 unconnected pads **
 [unconnected_items]: Missing connection between items
     Local override; error
-    @(42.0625 mm, 12.2500 mm): Pad 4 [3V3] of U2 on F.Cu
-    @(49.5500 mm, 11.5000 mm): Pad 2 [VBACKUP] of D4 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(49.5500 mm, 11.5000 mm): Pad 2 [VBACKUP] of D4 on F.Cu
-    @(50.5000 mm, 16.2500 mm): Track [3V3] on F.Cu, length 2.5000 mm
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(9.0450 mm, 32.7500 mm): Track [CC1_OUT] on F.Cu, length 1.0000 mm
-    @(11.9900 mm, 31.8000 mm): Pad 1 [CC1_OUT] of R4 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(9.0450 mm, 35.7500 mm): Track [CC2_OUT] on F.Cu, length 1.0000 mm
-    @(11.9900 mm, 33.5000 mm): Pad 1 [CC2_OUT] of R5 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(47.5000 mm, 30.4900 mm): Pad 2 [D1_GRN] of R21 on F.Cu
-    @(55.0000 mm, 36.2500 mm): Pad 3 [D2_GRN] of D2 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(52.0000 mm, 34.7500 mm): Pad 1 [D2_RED] of D2 on F.Cu
-    @(45.5000 mm, 30.4900 mm): Pad 2 [D1_RED] of R20 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(52.8500 mm, 20.5000 mm): Pad 1 [CHG_JP] of JP1 on F.Cu
-    @(46.7500 mm, 21.5000 mm): Track [FB_MID] on F.Cu, length 2.0000 mm
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(9.0450 mm, 30.7500 mm): Pad A1 [GND] of J2 on F.Cu
-    @(12.5000 mm, 9.5200 mm): Pad 2 [GND] of C15 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(10.0100 mm, 23.2000 mm): Pad 2 [GND] of R9 on F.Cu
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(13.0100 mm, 16.0000 mm): Pad 2 [GND] of R2 on F.Cu
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(13.0100 mm, 16.0000 mm): Pad 2 [GND] of R2 on F.Cu
+    @(13.0100 mm, 16.0000 mm): Track [GND] on F.Cu, length 0.9000 mm
     @(9.0450 mm, 37.2500 mm): Pad A12 [GND] of J2 on F.Cu
 [unconnected_items]: Missing connection between items
     Local override; error
@@ -251,28 +27,16 @@
     @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
 [unconnected_items]: Missing connection between items
     Local override; error
-    @(15.5250 mm, 10.6350 mm): Pad 3 [GND] of U4 on F.Cu
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-[unconnected_items]: Missing connection between items
-    Local override; error
     @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
     @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(23.0000 mm, 13.2250 mm): Pad 2 [GND] of C6 on F.Cu
-    @(25.5000 mm, 8.2250 mm): Pad 2 [GND] of C8 on F.Cu
 [unconnected_items]: Missing connection between items
     Local override; error
     @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
     @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
 [unconnected_items]: Missing connection between items
     Local override; error
-    @(25.5000 mm, 8.2250 mm): Pad 2 [GND] of C8 on F.Cu
     @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(25.5000 mm, 8.2250 mm): Pad 2 [GND] of C8 on F.Cu
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
+    @(0.0000 mm, 0.0000 mm): Zone [GND] on B.Cu, priority 0
 [unconnected_items]: Missing connection between items
     Local override; error
     @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
@@ -284,83 +48,27 @@
 [unconnected_items]: Missing connection between items
     Local override; error
     @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(33.5000 mm, 8.2250 mm): Pad 2 [GND] of C9 on F.Cu
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(33.5000 mm, 8.2250 mm): Pad 2 [GND] of C9 on F.Cu
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(33.5500 mm, 25.2000 mm): Pad 2 [GND] of U3 on F.Cu
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(36.4500 mm, 25.2000 mm): Pad 13 [GND] of U3 on F.Cu
-    @(33.5500 mm, 25.2000 mm): Pad 2 [GND] of U3 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(36.4500 mm, 25.2000 mm): Pad 13 [GND] of U3 on F.Cu
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(40.5000 mm, 28.0500 mm): Pad 2 [GND] of C4 on F.Cu
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-[unconnected_items]: Missing connection between items
-    Local override; error
     @(42.0625 mm, 11.7500 mm): Pad 3 [GND] of U2 on F.Cu
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
 [unconnected_items]: Missing connection between items
     Local override; error
     @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(45.5800 mm, 4.0000 mm): PTH pad 3 [GND] of J5
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(52.5250 mm, 11.4050 mm): Pad 4 [GND] of U1 on F.Cu
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
+    @(42.0625 mm, 11.7500 mm): Pad 3 [GND] of U2 on F.Cu
 [unconnected_items]: Missing connection between items
     Local override; error
     @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
     @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
 [unconnected_items]: Missing connection between items
     Local override; error
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
-    @(0.0000 mm, 0.0000 mm): Zone [GND] on F.Cu, priority 0
+    @(22.0000 mm, 21.5000 mm): Pad 9 [VBAT] of Q2 on F.Cu
+    @(23.4500 mm, 21.1750 mm): Track [VBAT] on F.Cu, length 0.6500 mm
 [unconnected_items]: Missing connection between items
     Local override; error
-    @(44.2500 mm, 13.9380 mm): Track [LED_BAT_A] on F.Cu, length 1.0000 mm
-    @(51.5000 mm, 31.5100 mm): Pad 1 [LED_BAT_A] of R22 on F.Cu
+    @(43.7500 mm, 13.9375 mm): Pad 9 [LED_BAT_B] of U2 on F.Cu
+    @(53.5000 mm, 31.5100 mm): Pad 1 [LED_BAT_B] of R23 on F.Cu
 [unconnected_items]: Missing connection between items
     Local override; error
-    @(45.9375 mm, 11.7500 mm): Pad 16 [SCL] of U2 on F.Cu
-    @(60.0000 mm, 28.5000 mm): Pad 4 [SCL] of J4 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(17.0000 mm, 41.5000 mm): PTH pad 1 [VBAT] of J3
-    @(58.5000 mm, 20.5000 mm): Pad 1 [VBACKUP] of TP1 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(24.2500 mm, 24.7500 mm): Track [VBAT] on F.Cu, length 12.2500 mm
-    @(58.5000 mm, 20.5000 mm): Pad 1 [VBACKUP] of TP1 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(58.5000 mm, 20.5000 mm): Pad 1 [VBACKUP] of TP1 on F.Cu
-    @(40.5000 mm, 30.0000 mm): Track [VOUT] on F.Cu, length 0.5000 mm
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(54.1500 mm, 20.5000 mm): Pad 2 [VBACKUP] of JP1 on F.Cu
-    @(44.0000 mm, 27.9500 mm): Pad 1 [VOUT] of C5 on F.Cu
-[unconnected_items]: Missing connection between items
-    Local override; error
-    @(54.1500 mm, 20.5000 mm): Pad 2 [VBACKUP] of JP1 on F.Cu
-    @(47.5000 mm, 20.4900 mm): Pad 2 [VOUT] of R26 on F.Cu
+    @(45.9375 mm, 10.7500 mm): Pad 18 [RTC_SCL] of U2 on F.Cu
+    @(56.0000 mm, 14.9900 mm): Pad 2 [RTC_SCL] of R18 on F.Cu
 
 ** Found 0 Footprint errors **
 

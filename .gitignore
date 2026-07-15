@@ -2,3 +2,5 @@ hardware/.history/
 hardware/__pycache__/
 hardware/*.lck
 hardware/*-backups/
+hardware/freerouting.jar
+hardware/drc_*.rpt

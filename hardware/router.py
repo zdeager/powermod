@@ -55,24 +55,31 @@ def parse_pads():
             pe=matching(blk,p); pb=blk[p:pe]; j=pe
             pm=re.search(r'\(at (-?[\d.]+) (-?[\d.]+)(?: (-?[\d.]+))?\)',pb)
             sm=re.search(r'\(size ([\d.]+) ([\d.]+)\)',pb)
-            nm=re.search(r'\(net (\d+) "([^"]*)"\)',pb)
+            nm=re.search(r'\(net (?:\d+ )?"([^"]*)"\)',pb)
             ly=re.search(r'\(layers ([^)]+)\)',pb)
             px,py=float(pm.group(1)),float(pm.group(2))
             pa=float(pm.group(3) or 0)
             sx,sy=float(sm.group(1)),float(sm.group(2))
+            if '(primitives' in pb: sx+=1.0; sy+=1.0   # custom-shape pad: bbox is a lie
             # pad bbox half extents in board frame: pad angle pa is absolute
             if abs(pa%180)>45: sx,sy=sy,sx
             ax=fx + px*c + py*si
             ay=fy - px*si + py*c
             layers=ly.group(1)
             through='*.Cu' in layers or 'thru' in pb
-            pads.append((nm.group(2) if nm else '', ax, ay, sx/2, sy/2,
+            pads.append((nm.group(1) if nm else '', ax, ay, sx/2, sy/2,
                          'BOTH' if through else ('F' if 'F.Cu' in layers else 'B'), fpid))
     return pads
 
 def net_codes():
     s=open(BOARD).read()
-    return {m.group(2):int(m.group(1)) for m in re.finditer(r'^ \(net (\d+) "([^"]+)"\)',s,re.M)}
+    out={}
+    for m in re.finditer(r'\(net (\d+) "([^"]+)"\)',s):
+        out[m.group(2)]=int(m.group(1))
+    if not out:  # KiCad 10 name-based format
+        for m in re.finditer(r'\(net "([^"]+)"\)',s):
+            out.setdefault(m.group(1), f'"{m.group(1)}"')
+    return out
 
 # ------------------------------------------------------------- ratsnest edges
 def ratsnest():
@@ -220,13 +227,15 @@ def compress(path,p1,p2,w):
 # --------------------------------------------------------------------- main
 def parse_existing(obs, inv):
     s=open(BOARD).read()
-    for m in re.finditer(r'\(segment \(start (-?[\d.]+) (-?[\d.]+)\) \(end (-?[\d.]+) (-?[\d.]+)\) \(width ([\d.]+)\) \(layer "([FB])\.Cu"\) \(net (\d+)\)\)', s):
+    for m in re.finditer(r'\(segment\s+\(start (-?[\d.]+) (-?[\d.]+)\)\s+\(end (-?[\d.]+) (-?[\d.]+)\)\s+\(width ([\d.]+)\)\s*(?:\(locked[^)]*\)\s*)?\(layer "([FB])\.Cu"\)\s+\(net "?([^")]+)"?\)', s):
         x1,y1,x2,y2,w,l,n=m.groups()
-        obs.add_track(l,float(x1),float(y1),float(x2),float(y2),float(w)/2,inv.get(int(n),'?'))
+        net = inv.get(int(n),'?') if n.isdigit() else n
+        obs.add_track(l,float(x1),float(y1),float(x2),float(y2),float(w)/2,net)
     for m in re.finditer(r'\(via \(at (-?[\d.]+) (-?[\d.]+)\)[^)]*\(net (\d+)\)\)', s):
         pass
-    for m in re.finditer(r'\(via \(at (-?[\d.]+) (-?[\d.]+)\) \(size [\d.]+\) \(drill [\d.]+\) \(layers "F\.Cu" "B\.Cu"\) \(net (\d+)\)\)', s):
-        x,y,n=m.groups(); obs.add_via(float(x),float(y),inv.get(int(n),'?'))
+    for m in re.finditer(r'\(via\s+\(at (-?[\d.]+) (-?[\d.]+)\)\s+\(size [\d.]+\)\s+\(drill [\d.]+\)\s+\(layers "F\.Cu" "B\.Cu"\)\s*(?:\(locked[^)]*\)\s*)?\(net "?([^")]+)"?\)', s):
+        x,y,n=m.groups()
+        obs.add_via(float(x),float(y),inv.get(int(n),'?') if n.isdigit() else n)
 
 def emit_path(obs,codes,emitted,net,w,p1,p2,path):
     prims=compress(path,p1,p2,w)
