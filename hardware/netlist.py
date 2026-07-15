@@ -31,13 +31,13 @@ COMPONENTS = {
    '1':('OSCI','OSCI'), '2':('OSCO','OSCO'), '3':('INT','RTC_INT'), '4':('VSS','GND'),
    '5':('SDA','RTC_SDA'), '6':('SCL','RTC_SCL'), '7':('CLKOUT','NC'), '8':('VDD','RTC_VDD')}),
  'U2': ('ATtiny1617', 'Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm', 'C614176', {
-   '1':('PA2/RTC_INT','RTC_INT'), '2':('PA3/CONV_EN','CONV_EN'), '3':('GND','GND'),
+   '1':('PA2/BUTTON','BUTTON'), '2':('PA3/CONV_EN','CONV_EN'), '3':('GND','GND'),
    '4':('VDD','3V3'), '5':('PA4/VBAT_SENSE','VBAT_DIV'), '6':('PA5/VBUS_SENSE','VBUS_DIV'),
    '7':('PA6','NC'), '8':('PA7','NC'), '9':('PB7/LED_BAT_B','LED_BAT_B'),
    '10':('PB6/LED_BAT_A','LED_BAT_A'), '11':('PB5/CHG_STDBY','CHG_STDBY'),
    '12':('PB4/CHG_CHRG','CHG_CHRG'), '13':('PB3/LED_PWR_B','LED_PWR_B'),
    '14':('PB2/LED_PWR_A','LED_PWR_A'), '15':('PB1/SDA','SDA'), '16':('PB0/SCL','SCL'),
-   '17':('PC0','NC'), '18':('PC1','NC'), '19':('PC2/BUTTON','BUTTON'),
+   '17':('PC0','NC'), '18':('PC1','NC'), '19':('PC2/RTC_INT','RTC_INT'),
    '20':('PC3/Q1_GATE_DRV','Q1_GATE_DRV'), '21':('PC4/CHG_CE','CHG_CE'), '22':('PC5/RTC_SCL','RTC_SCL'),
    '23':('PA0/UPDI','UPDI'), '24':('PA1/RTC_SDA','RTC_SDA'), '25':('PAD','GND')}),
  'U3': ('TPS63020DSJR', 'Package_SON:VSON-14-1EP_3x4.45mm_P0.65mm_EP1.6x4.2mm', 'C15483', {
