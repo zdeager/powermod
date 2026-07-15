@@ -70,7 +70,7 @@
    (fields (field (name "LCSC") "C194063")))
   (comp (ref "U2") (value "ATtiny1617") (footprint "Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm")
    (fields (field (name "LCSC") "C614176")))
-  (comp (ref "U3") (value "TPS63020DSJR") (footprint "Package_SON:VSON-14-1EP_3x4.45mm_P0.65mm_EP1.6x4.2mm_ThermalVias")
+  (comp (ref "U3") (value "TPS63020DSJR") (footprint "Package_SON:VSON-14-1EP_3x4.45mm_P0.65mm_EP1.6x4.2mm")
    (fields (field (name "LCSC") "C15483")))
   (comp (ref "U4") (value "TP4056") (footprint "Package_SO:SOIC-8-1EP_3.9x4.9mm_P1.27mm_EP2.29x3mm")
    (fields (field (name "LCSC") "C382139")))

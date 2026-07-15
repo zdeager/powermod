@@ -40,7 +40,7 @@ COMPONENTS = {
    '17':('PC0/RTC_SDA','RTC_SDA'), '18':('PC1/RTC_SCL','RTC_SCL'), '19':('PC2/BUTTON','BUTTON'),
    '20':('PC3/Q1_GATE_DRV','Q1_GATE_DRV'), '21':('PC4/CHG_CE','CHG_CE'), '22':('PC5','NC'),
    '23':('PA0/UPDI','UPDI'), '24':('PA1','NC'), 'EP':('PAD','GND')}),
- 'U3': ('TPS63020DSJR', 'Package_SON:VSON-14-1EP_3x4.45mm_P0.65mm_EP1.6x4.2mm_ThermalVias', 'C15483', {
+ 'U3': ('TPS63020DSJR', 'Package_SON:VSON-14-1EP_3x4.45mm_P0.65mm_EP1.6x4.2mm', 'C15483', {
    '1':('VINA','VSYS'), '2':('GND','GND'), '3':('FB','FB'), '4':('VOUT','VOUT'),
    '5':('VOUT','VOUT'), '6':('L2','L2'), '7':('L2','L2'), '8':('L1','L1N'),
    '9':('L1','L1N'), '10':('VIN','VSYS'), '11':('VIN','VSYS'), '12':('EN','CONV_EN'),

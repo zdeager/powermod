@@ -1,0 +1,4 @@
+hardware/.history/
+hardware/__pycache__/
+hardware/*.lck
+hardware/*-backups/

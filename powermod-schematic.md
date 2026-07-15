@@ -138,3 +138,11 @@ IN (3) → VSYS + 1µF→GND; OUT (2) → **3V3** + 1µF→GND; VSS (1) → GND.
 7. Exposed pads: U2→GND, U3→PGND, U4→GND, Q1/Q2 pad = drain (net check!).
 8. Crystal guard ring; keep the 2.4MHz converter's L1 loop away from OSCI/OSCO.
 9. XC6206, BSS138, J4 pin orders: **verify against the actual LCSC footprints** before ordering (flagged in §0).
+
+## 4. Layout (hardware/layout.py → powermod.kicad_pcb)
+
+**Status: placed and DRC-clean; unrouted.** 62×46mm, 2-layer, all 69 components + 4× M2 mounting holes, every pad net-bound (live ratsnest), GND poured both sides. `kicad-cli pcb drc`: **0 electrical/mechanical violations** — remaining items are the 160-edge ratsnest (routing is interactive work in pcbnew) and silk-text warnings (cleaned during routing).
+
+Floorplan intent, encoded in `layout.py` and verified by render: power flows left→right (J1 → charger/OR → VSYS → converter → VOUT → J2, both USB-C on the left edge); **the crystal sits ~36mm from the inductor loop** (checklist item 8); converter input/output caps flank U3 tightly; connectors and human-facing parts (LEDs, button, jumpers, test pads) on edges.
+
+Layout-time notes: U3's exposed pad wants thermal vias — add them manually with ≥0.3mm drills (the library's ThermalVias variant uses 0.2mm, below the default DRC floor, which is why the plain footprint is specced); route the converter loop (C1/C2 → U3 → L1 → C3-C5) first and tight; VBUS/VSYS/VBAT/VOUT at ≥1mm width per the ratings table currents.
