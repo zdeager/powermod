@@ -1,0 +1,2 @@
+(sym_lib_table (version 7)
+  (lib (name "powermod")(type "KiCad")(uri "${KIPRJMOD}/powermod.kicad_sym")(options "")(descr "generated")))

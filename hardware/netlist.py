@@ -40,31 +40,31 @@ COMPONENTS = {
    '17':('PC0/RTC_SDA','RTC_SDA'), '18':('PC1/RTC_SCL','RTC_SCL'), '19':('PC2/BUTTON','BUTTON'),
    '20':('PC3/Q1_GATE_DRV','Q1_GATE_DRV'), '21':('PC4/CHG_CE','CHG_CE'), '22':('PC5','NC'),
    '23':('PA0/UPDI','UPDI'), '24':('PA1','NC'), 'EP':('PAD','GND')}),
- 'U3': ('TPS63020DSJR', 'Package_SON:VSON-14-1EP_3.5x3.5mm_P0.5mm', 'C15483', {
+ 'U3': ('TPS63020DSJR', 'Package_SON:VSON-14-1EP_3x4.45mm_P0.65mm_EP1.6x4.2mm_ThermalVias', 'C15483', {
    '1':('VINA','VSYS'), '2':('GND','GND'), '3':('FB','FB'), '4':('VOUT','VOUT'),
    '5':('VOUT','VOUT'), '6':('L2','L2'), '7':('L2','L2'), '8':('L1','L1N'),
    '9':('L1','L1N'), '10':('VIN','VSYS'), '11':('VIN','VSYS'), '12':('EN','CONV_EN'),
    '13':('PS/SYNC','GND'), '14':('PG','NC'), 'EP':('PGND','GND')}),
- 'U4': ('TP4056', 'Package_SO:SOIC-8-1EP_3.9x4.9mm_P1.27mm_EP2.29x2.29mm', 'C382139', {
+ 'U4': ('TP4056', 'Package_SO:SOIC-8-1EP_3.9x4.9mm_P1.27mm_EP2.29x3mm', 'C382139', {
    '1':('TEMP','GND'), '2':('PROG','PROG'), '3':('GND','GND'), '4':('VCC','VBUS'),
    '5':('BAT','VBAT'), '6':('STDBY','CHG_STDBY'), '7':('CHRG','CHG_CHRG'),
    '8':('CE','CHG_CE'), 'EP':('PAD','GND')}),
  'U5': ('XC6206P332MR', FP['SOT'], 'C5446', {   # pin order = convention, VERIFY
    '1':('VSS','GND'), '2':('VOUT','3V3'), '3':('VIN','VSYS')}),
  # --- FETs ---
- 'Q1': ('AON7407', 'Package_DFN_QFN:DFN-8-1EP_3x3mm_P0.65mm', 'C176756', {
+ 'Q1': ('AON7407', 'Package_DFN_QFN:DFN-8-1EP_3x3mm_P0.65mm_EP1.6x2.56mm', 'C176756', {
    '1':('S','VSYS'), '2':('S','VSYS'), '3':('S','VSYS'), '4':('G','Q1_GATE'),
    '5':('D','VBUS'), '6':('D','VBUS'), '7':('D','VBUS'), '8':('D','VBUS'), 'EP':('D','VBUS')}),
- 'Q2': ('AON7407', 'Package_DFN_QFN:DFN-8-1EP_3x3mm_P0.65mm', 'C176756', {
+ 'Q2': ('AON7407', 'Package_DFN_QFN:DFN-8-1EP_3x3mm_P0.65mm_EP1.6x2.56mm', 'C176756', {
    '1':('S','VSYS'), '2':('S','VSYS'), '3':('S','VSYS'), '4':('G','VBUS'),
    '5':('D','VBAT'), '6':('D','VBAT'), '7':('D','VBAT'), '8':('D','VBAT'), 'EP':('D','VBAT')}),
  'Q3': ('BSS138', FP['SOT'], 'C52895', {         # pin order = convention, VERIFY
    '1':('G','Q1_GATE_DRV'), '2':('S','GND'), '3':('D','Q3_DRAIN')}),
  # --- diodes / LEDs / crystal ---
- 'D1': ('LED_RG_CC', 'LED_SMD:LED_LTST-C155GEKT', None, {  # pin order VERIFY vs part
-   '1':('A_RED','D1_RED'), '2':('K','GND'), '3':('A_GRN','D1_GRN')}),
- 'D2': ('LED_RG_CC', 'LED_SMD:LED_LTST-C155GEKT', None, {
-   '1':('A_RED','D2_RED'), '2':('K','GND'), '3':('A_GRN','D2_GRN')}),
+ 'D1': ('LED_RG_PLCC4', 'LED_SMD:LED_Avago_PLCC4_3.2x2.8mm_CW', None, {  # pad map VERIFY vs chosen part
+   '1':('A_RED','D1_RED'), '2':('K_RED','GND'), '3':('A_GRN','D1_GRN'), '4':('K_GRN','GND')}),
+ 'D2': ('LED_RG_PLCC4', 'LED_SMD:LED_Avago_PLCC4_3.2x2.8mm_CW', None, {
+   '1':('A_RED','D2_RED'), '2':('K_RED','GND'), '3':('A_GRN','D2_GRN'), '4':('K_GRN','GND')}),
  'D3': ('1N4148WS', FP['SOD'], None, {'1':('K','RTC_VDD'), '2':('A','3V3')}),
  'D4': ('1N4148WS', FP['SOD'], None, {'1':('K','RTC_VDD'), '2':('A','VBACKUP')}),
  'Y1': ('32.768kHz', 'Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm', None, {
@@ -86,11 +86,11 @@ COMPONENTS = {
    '1':('GND','GND'), '2':('VCC_NC','NC'), '3':('SDA','SDA'), '4':('SCL','SCL')}),
  'J5': ('UPDI_HDR', 'Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical', None, {
    '1':('UPDI','UPDI'), '2':('3V3','3V3'), '3':('GND','GND')}),
- 'SW1':('BUTTON', 'Button_Switch_SMD:SW_SPST_PTS645', None, {
+ 'SW1':('BUTTON', 'Button_Switch_SMD:SW_SPST_PTS647_Sx50', None, {
    '1':('A','BUTTON'), '2':('B','GND')}),
  'JP1':('CHG_JUMPER', FP['SJ'], None, {'1':('A','CHG_JP'), '2':('B','VBACKUP')}),
  'JP2':('VSEL_JUMPER', FP['SJ'], None, {'1':('A','FB_MID'), '2':('B','VOUT')}),
- 'L1': ('1.5uH_4.5A', 'Inductor_SMD:L_Sumida_CDMC6D28', None, {  # footprint per chosen part
+ 'L1': ('1.5uH_4.5A', 'Inductor_SMD:L_Sumida_CDMC6D28_7.25x6.5mm', None, {  # footprint per chosen part
    '1':('1','L1N'), '2':('2','L2')}),
  # --- test pads ---
  'TP1':('VBACKUP_PAD', FP['TP'], None, {'1':('P','VBACKUP')}),
@@ -200,14 +200,14 @@ def gen_sch(path):
                          f' (number "{pin}" (effects (font (size 1.0 1.0)))))')
             coords[pin]=(px-2.54 if side==0 else px+2.54, py)
         h=max(nleft,len(keys)-nleft)*PITCH/2+1.27
-        lib[name]=(f'(symbol "{name}" (pin_numbers hide) (in_bom yes) (on_board yes)\n'
+        lib[name]=(f'(symbol "powermod:{name}" (pin_numbers hide) (in_bom yes) (on_board yes)\n'
           f' (property "Reference" "{ref[0]}" (at 0 {h+2.54} 0) (effects (font (size 1.27 1.27))))\n'
           f' (property "Value" "{val}" (at 0 {-h-2.54} 0) (effects (font (size 1.27 1.27))))\n'
           f' (symbol "{name}_1_1" (rectangle (start {-half} {h}) (end {half} {-h})'
           f' (stroke (width 0.15) (type default)) (fill (type background)))\n  '
           +'\n  '.join(pdefs)+'))', coords)
     # place instances on a grid
-    x0,y0,dx,dy,percol=30,30,72,66,7
+    x0,y0,dx,dy,percol=30.48,30.48,71.12,66.04,7
     body=[]
     for i,(ref,(val,fp,lcsc,pins)) in enumerate(sorted(COMPONENTS.items())):
         X=x0+(i//percol)*dx; Y=y0+(i%percol)*dy
@@ -232,11 +232,37 @@ def gen_sch(path):
          +'\n '.join(body)+'\n '+'\n '.join(labels)+'\n '+'\n '.join(nc)+'\n)')
     open(path,'w').write(sch)
 
+def gen_symlib(path):
+    """Write the powermod symbol library so lib_ids resolve on disk too."""
+    nets,_=validate()
+    # regenerate defs identically to gen_sch's lib builder
+    import re
+    sch=open(os.path.join(os.path.dirname(path),'powermod.kicad_sch')).read()
+    i=sch.find('(lib_symbols'); depth=0; j=i
+    for k,ch in enumerate(sch[i:],i):
+        if ch=='(':depth+=1
+        elif ch==')':
+            depth-=1
+            if depth==0: j=k+1; break
+    body=sch[i+len('(lib_symbols'):j-1]
+    open(path,'w').write('(kicad_symbol_lib (version 20231120) (generator powermod_netlist_py)'+body+')')
+
 if __name__=='__main__':
     nets,errs=validate()
     if errs:
         print("VALIDATION FAILED:"); [print(" ",e) for e in errs]; sys.exit(1)
     ncount=gen_net(os.path.join(os.path.dirname(__file__) or '.','powermod.net'))
-    gen_sch(os.path.join(os.path.dirname(__file__) or '.','powermod.kicad_sch'))
+    d=os.path.dirname(__file__) or '.'
+    gen_sch(os.path.join(d,'powermod.kicad_sch'))
+    gen_symlib(os.path.join(d,'powermod.kicad_sym'))
+    open(os.path.join(d,'sym-lib-table'),'w').write(
+      '(sym_lib_table (version 7)\n  (lib (name "powermod")(type "KiCad")(uri "${KIPRJMOD}/powermod.kicad_sym")(options "")(descr "generated")))\n')
+    libs=sorted({c[1].split(':')[0] for c in COMPONENTS.values()})
+    open(os.path.join(d,'fp-lib-table'),'w').write(
+      '(fp_lib_table (version 7)\n'+''.join(
+        f'  (lib (name "{l}")(type "KiCad")(uri "${{KICAD10_FOOTPRINT_DIR}}/{l}.pretty")(options "")(descr ""))\n'
+        for l in libs)+')\n')
+    if not os.path.exists(os.path.join(d,'powermod.kicad_pro')):
+        open(os.path.join(d,'powermod.kicad_pro'),'w').write('{"meta":{"filename":"powermod.kicad_pro","version":3}}')
     npins=sum(len(c[3]) for c in COMPONENTS.values())
     print(f"OK: {len(COMPONENTS)} components, {npins} pins, {ncount} nets -> powermod.net, powermod.kicad_sch")
