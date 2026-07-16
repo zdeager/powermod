@@ -141,7 +141,13 @@ IN (3) → VSYS + 1µF→GND; OUT (2) → **3V3** + 1µF→GND; VSS (1) → GND.
 
 ## 4. Layout (hardware/layout.py → powermod.kicad_pcb)
 
-**Status: v1 complete — placed, fully routed, DRC clean.** **58×40mm** (62×46 → 56×40 → 58×40; the last +2mm on the right reopened a corridor that a pad wall had sealed), 2-layer, all 69 components + 4× M2.5 mounting holes 3.2mm in from each corner, every pad net-bound, GND poured both sides. `kicad-cli pcb drc --refill-zones --severity-error`: **0 violations, 0 unconnected pads, 0 footprint errors.** The 140 remaining all-severity items are silkscreen cosmetics (reference text over pads/mask), which do not affect fabrication.
+**Status: v1 is a routing milestone, NOT fab-ready.** **58×40mm** (62×46 → 56×40 → 58×40; the last +2mm on the right reopened a corridor that a pad wall had sealed), 2-layer, all 69 components + 4× M2.5 mounting holes 3.2mm in from each corner, every pad net-bound, GND poured both sides. `kicad-cli pcb drc --refill-zones --severity-error`: 0 violations, 0 unconnected pads, 0 footprint errors; the 140 all-severity items are silkscreen cosmetics.
+
+> **Do not fabricate v1.** Every power net — VBUS, VSYS, VBAT, VOUT — is routed at **0.2mm**, against the ≥1mm this section requires for the ratings-table currents (a ~5× overload at 3A). A green DRC answered "are the nets connected?", never "are they correct?".
+>
+> **Two separate omissions, and both matter.** *Routing*: with no net class defined, Freerouting had nothing to aim for and defaulted every net to 0.2mm — `hardware/netclasses.py` fixes that, and the classes do propagate into the DSN. *Checking*: a net class `track_width` is only a router preference — **KiCad's DRC does not check it**. v1 still reported 0 violations with the classes defined. Enforcement needs an explicit custom rule; `hardware/powermod.kicad_dru` adds one, and against the identical unchanged board it turns "0 violations" into **171 `track_width` errors**. Any board here without a `.kicad_dru` is unchecked for width, whatever DRC says.
+>
+> **v1 cannot route at its own spec**: with 1.1mm power enforced, 12 of 117 nets fail on 58×40 — a 2-layer board this size has no room. Closing that would need a bigger outline, front-side power pours, or an honest current derate; all were rejected in favour of fixing it properly in v2 (2026-07-16 decision), where In2 power planes carry the current and trace width stops being the constraint.
 
 Floorplan intent, encoded in `layout.py` and verified by render: power flows left→right (J1 → charger/OR → VSYS → converter → VOUT → J2, both USB-C on the left edge); **the crystal sits ~36mm from the inductor loop** (checklist item 8); converter input/output caps flank U3 tightly; connectors and human-facing parts (LEDs, button, jumpers, test pads) on edges.
 

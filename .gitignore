@@ -8,3 +8,6 @@ hardware/*.dsn
 hardware/*.ses
 hardware/*.kicad_prl
 hardware/from_kicad.net
+hardware/*.ses
+hardware/*.dsn
+hardware/v2*.log

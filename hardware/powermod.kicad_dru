@@ -1,0 +1,32 @@
+(version 1)
+
+# Custom DRC rules — the ENFORCEMENT half of trace widths.
+#
+# Setting a net class track_width in the project only tells the router what to
+# aim for; KiCad's DRC does not check it. Without a rule like this, a board
+# carrying 3A on a 0.2mm trace reports "0 violations" — which is exactly how
+# v1's power nets shipped at 0.2mm against a documented >=1mm requirement.
+#
+# Widths per powermod-schematic.md's ratings table, IPC-2221 (1oz external,
+# ~10C rise). These are minimums for the current each conductor actually carries.
+
+(rule "power rail escape width"
+	(condition "A.NetClass == 'Power'")
+	(constraint track_width (min 0.55mm))
+	# Per-pin escape into the In2 power planes, not bulk distribution: USB-C
+	# splits VBUS across 4 pins (~0.75A each of 3A), and the plane carries the
+	# aggregate. 0.55mm passes ~1.4A on its own.
+)
+
+(rule "converter switch node width"
+	(condition "A.NetClass == 'Switch'")
+	(constraint track_width (min 1.0mm))
+	# L1N/L2 have no plane behind them — the full TPS63020 inductor current
+	# flows in this one trace, so it must be wide for real.
+)
+
+(rule "logic rail width"
+	(condition "A.NetClass == 'Logic'")
+	(constraint track_width (min 0.35mm))
+	# 3V3 from the XC6206, 200mA ceiling.
+)
