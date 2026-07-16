@@ -30,16 +30,20 @@ COMPONENTS = {
  'U1': ('BM8563', 'Package_SO:SOIC-8_3.9x4.9mm_P1.27mm', 'C194063', {
    '1':('OSCI','OSCI'), '2':('OSCO','OSCO'), '3':('INT','RTC_INT'), '4':('VSS','GND'),
    '5':('SDA','RTC_SDA'), '6':('SCL','RTC_SCL'), '7':('CLKOUT','NC'), '8':('VDD','RTC_VDD')}),
- 'U2': ('ATtiny1617', 'Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm', 'C614176', {
-   '1':('PA2/BUTTON','BUTTON'), '2':('PA3/CONV_EN','CONV_EN'), '3':('GND','GND'),
-   '4':('VDD','3V3'), '5':('PA4/VBAT_SENSE','VBAT_DIV'), '6':('PA5/VBUS_SENSE','VBUS_DIV'),
-   '7':('PA6','NC'), '8':('PA7','NC'), '9':('PB7/LED_BAT_B','LED_BAT_B'),
-   '10':('PB6/LED_BAT_A','LED_BAT_A'), '11':('PB5/CHG_STDBY','CHG_STDBY'),
-   '12':('PB4/CHG_CHRG','CHG_CHRG'), '13':('PB3/LED_PWR_B','LED_PWR_B'),
-   '14':('PB2/LED_PWR_A','LED_PWR_A'), '15':('PB1/SDA','SDA'), '16':('PB0/SCL','SCL'),
-   '17':('PC0','NC'), '18':('PC1','NC'), '19':('PC2/RTC_INT','RTC_INT'),
-   '20':('PC3/Q1_GATE_DRV','Q1_GATE_DRV'), '21':('PC4/CHG_CE','CHG_CE'), '22':('PC5/RTC_SCL','RTC_SCL'),
-   '23':('PA0/UPDI','UPDI'), '24':('PA1/RTC_SDA','RTC_SDA'), '25':('PAD','GND')}),
+ # ATtiny1616 SOIC-20 (was ATtiny1617 QFN-24): 1.27mm pitch, no exposed pad,
+ # hand-solderable, far easier to route. Pinout = KiCad ATtiny406-S base (verified
+ # against the symbol lib). 4 signals reassigned off pins the 20-pin part lacks
+ # (PB6/PB7/PC4/PC5 -> PA6/PA7/PC0/PC1); zero spare pins now. LCSC to confirm.
+ 'U2': ('ATtiny1616', 'Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm', 'C2891852', {
+   '1':('VCC','3V3'), '2':('PA4/VBAT_SENSE','VBAT_DIV'), '3':('PA5/VBUS_SENSE','VBUS_DIV'),
+   '4':('PA6/LED_BAT_A','LED_BAT_A'), '5':('PA7/LED_BAT_B','LED_BAT_B'),
+   '6':('PB5/CHG_STDBY','CHG_STDBY'), '7':('PB4/CHG_CHRG','CHG_CHRG'),
+   '8':('PB3/LED_PWR_B','LED_PWR_B'), '9':('PB2/LED_PWR_A','LED_PWR_A'),
+   '10':('PB1/SDA','SDA'), '11':('PB0/SCL','SCL'),
+   '12':('PC0/CHG_CE','CHG_CE'), '13':('PC1/RTC_SCL','RTC_SCL'),
+   '14':('PC2/RTC_INT','RTC_INT'), '15':('PC3/Q1_GATE_DRV','Q1_GATE_DRV'),
+   '16':('PA0/UPDI','UPDI'), '17':('PA1/RTC_SDA','RTC_SDA'),
+   '18':('PA2/BUTTON','BUTTON'), '19':('PA3/CONV_EN','CONV_EN'), '20':('GND','GND')}),
  'U3': ('TPS63020DSJR', 'Package_SON:VSON-14-1EP_3x4.45mm_P0.65mm_EP1.6x4.2mm', 'C15483', {
    '1':('VINA','VSYS'), '2':('GND','GND'), '3':('FB','FB'), '4':('VOUT','VOUT'),
    '5':('VOUT','VOUT'), '6':('L2','L2'), '7':('L2','L2'), '8':('L1','L1N'),
@@ -149,7 +153,7 @@ def validate():
     G=[('Q1','1','VSYS'),('Q1','4','Q1_GATE'),('Q1','5','VBUS'),
        ('Q2','1','VSYS'),('Q2','4','VBUS'),('Q2','5','VBAT'),
        ('U4','1','GND'),('U3','13','GND'),('U3','12','CONV_EN'),
-       ('U1','3','RTC_INT'),('U2','23','UPDI'),('U2','15','SDA'),('U2','16','SCL'),
+       ('U1','3','RTC_INT'),('U2','16','UPDI'),('U2','10','SDA'),('U2','11','SCL'),
        ('J4','2','NC'),('D3','2','3V3'),('D4','2','VBACKUP'),
        ('D3','1','RTC_VDD'),('D4','1','RTC_VDD')]
     for ref,pin,net in G:
@@ -158,7 +162,7 @@ def validate():
     # INT pull-up rail
     if COMPONENTS['R19'][3]['1'][1]!='3V3': errs.append("R19 not to 3V3")
     # pin-count sanity
-    expect={'U1':8,'U2':25,'U3':15,'U4':9,'U5':3,'Q1':9,'Q2':9,'Q3':3}
+    expect={'U1':8,'U2':20,'U3':15,'U4':9,'U5':3,'Q1':9,'Q2':9,'Q3':3}
     for ref,npins in expect.items():
         if len(COMPONENTS[ref][3])!=npins: errs.append(f"{ref} pin count {len(COMPONENTS[ref][3])}!={npins}")
     return nets, errs
