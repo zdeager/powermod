@@ -61,6 +61,7 @@ Sources of truth: `powermod-spec.md` §Pre-BOM electrical walk (the net map this
 | R-en-pd | **100kΩ** | TPS63020 `EN` → GND | **Defines the host rail during MCU reset.** Stated tradeoff: an MCU WDT reset power-cycles the host |
 | R-pu ×5 | 10kΩ | `CHRG`, `STDBY`, internal SDA, SCL, **RTC `INT`** → 3V3 | TP4056 outputs and the RTC's `INT` are open-drain (datasheet: "requires pull-up resistor"). **`INT` pulls to 3V3, deliberately against the app manual's tie-to-VBACKUP advice** — an alarm asserting during a total outage would bleed the coin cell ~300µA into a pull-up serving a dead MCU |
 | R-led ×4 | ~560Ω | LED cathodes ← MCU | ~2mA at Vf ≈ 2.1V |
+| R28 | **100kΩ** | `CHG_CE` ↑ VBUS | **Charge-by-default (added 2026-07-16):** without it CE floats whenever PC4 is high-Z (reset, UPDI, unprogrammed MCU) — undefined charger state. Pull-up, not pull-down, so a dead-MCU board still charges; PC4 push-pull overrides. ~17µA only while on mains with PC4 driven low |
 | R-fb ×3 | **180kΩ low; 1MΩ + 620kΩ high-side, JP2 across the 620k** | TPS63020 FB + jumper | **Closed at schematic (was TBD):** VFB=500mV → open = 5.00V (ships), closed = 3.28V (TI Table 3's own 3.3V values). ~2.8µA, only while the converter runs |
 
 **Passives subtotal (all jellybean): ≈ $0.35**

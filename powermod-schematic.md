@@ -25,8 +25,8 @@ Sources: `powermod-spec.md` §Pre-BOM electrical walk (net map), `powermod-bom.m
 | 16 | PB0 | `SCL` (host bus) | TWI0 slave | **hardware TWI, fixed** |
 | 15 | PB1 | `SDA` (host bus) | TWI0 slave | **hardware TWI, fixed** |
 | 23 | PA0 | `UPDI` | programming | **fixed**; reserved, never GPIO |
-| 5 | PA4 | `VBAT_SENSE` | ADC0 AIN4 | analog port pin; 1M/330k + 100nF |
-| 6 | PA5 | `VBUS_SENSE` | ADC0 AIN5 | analog port pin; identical divider |
+| 5 | PA4 | `VBAT_SENSE` | ADC0 AIN4 | analog port pin; 1M/330k + 100nF. **Firmware MUST use the 1.5V internal reference** (see note) |
+| 6 | PA5 | `VBUS_SENSE` | ADC0 AIN5 | identical divider, same 1.5V-reference requirement |
 | 24 | PA1 | `RTC_SDA` | bit-banged, open-drain | internal bus; **top-side pin faces the RTC** (routability, see §4) |
 | 22 | PC5 | `RTC_SCL` | bit-banged, open-drain | internal bus; **top-side pin faces the RTC** (routability, see §4) |
 | 19 | PC2 | `RTC_INT` | input, 10k↑3V3 | **Px2 = fully-async pin** — edge wake from deepest sleep |
@@ -45,6 +45,8 @@ Sources: `powermod-spec.md` §Pre-BOM electrical walk (net map), `powermod-bom.m
 
 Board temperature needs **no pin** — internal ADC channel with `SIGROW.TEMPSENSE0/1` calibration.
 
+**ADC reference — 1.5V internal, a hardware-imposed firmware constraint (closed 2026-07-16).** The spec deferred "re-check the divider ratio against the chosen reference at schematic time," and that check never landed until the verification pass. With the identical 1M/330k dividers (÷4.03): VBUS at the USB max of 5.25V presents **1.30V** at PA5 — the 1.1V internal reference *clips*, silently reporting every healthy input as the same value. On the **1.5V reference** both channels fit with margin: VBUS ≤ 1.30V, VBAT ≤ 1.04V at 4.2V, LSB ≈ 5.9mV of rail. Never use VDD as reference — it tracks the 3V3 rail, which sags with the battery (spec §ADC), exactly the drift the fixed reference exists to avoid.
+
 ## 2. Block connections (every pin, every net)
 
 ### 2.1 USB-C input (J1) and VBUS
@@ -61,7 +63,7 @@ Board temperature needs **no pin** — internal ADC channel with `SIGROW.TEMPSEN
 | 5 BAT | **VBAT** (+ C-bat 4.7µF → GND) |
 | 6 STDBY | `CHG_STDBY` = PB5 (pin 11), 10k↑ 3V3 |
 | 7 CHRG | `CHG_CHRG` = PB4 (pin 12), 10k↑ 3V3 |
-| 8 CE | `CHG_CE` = PC4 (pin 21) |
+| 8 CE | `CHG_CE` = PC4 (pin 21); **R28 100kΩ ↑ VBUS** — charge-by-default. Without the pull, CE floats (undefined) whenever PC4 is high-Z: MCU in reset, under UPDI, or unprogrammed. Pull-up rather than pull-down so a board with a dead MCU still charges its battery, matching the charging-autonomy policy; PC4's push-pull drive overrides it either way (added 2026-07-16 verification pass) |
 
 ### 2.3 Battery and sense
 - J3 (JST-PH) pin+ and **BAT pad** → VBAT; pin− and **GND pad** → GND. Same copper — the 2A limit is the plug's.
@@ -138,10 +140,11 @@ IN (3) → VSYS + 1µF→GND; OUT (2) → **3V3** + 1µF→GND; VSS (1) → GND.
 7. Exposed pads: U2→GND, U3→PGND, U4→GND, Q1/Q2 pad = drain (net check!).
 8. Crystal guard ring; keep the 2.4MHz converter's L1 loop away from OSCI/OSCO.
 9. XC6206, BSS138, J4 pin orders: **verify against the actual LCSC footprints** before ordering (flagged in §0).
+10. Order-time additions from the 2026-07-16 verification pass: **C382139 must be the ESOP-8 (exposed-pad) TP4056** to match the footprint; **D1/D2 PLCC4 pad map vs the actual LED part** (netlist.py carries the in-source VERIFY flag; red/green only per BOM); **Y1 must be the CL=12.5pF 3215 variant** (BM8563's on-die oscillator caps expect it); **JST pigtail polarity vs J3 pin 1 = VBAT** — vendors wire both ways, and a reversed cell destroys the TP4056 (no reverse protection, by design). Also: don't program via UPDI with a deeply discharged cell attached — the programmer's 3.3V can back-feed through the LDO body and Q2 into the cell.
 
 ## 4. Layout (hardware/layout.py → powermod.kicad_pcb)
 
-**Status: v1 is a routing milestone, NOT fab-ready.** **58×40mm** (62×46 → 56×40 → 58×40; the last +2mm on the right reopened a corridor that a pad wall had sealed), 2-layer, all 69 components + 4× M2.5 mounting holes 3.2mm in from each corner, every pad net-bound, GND poured both sides. `kicad-cli pcb drc --refill-zones --severity-error`: 0 violations, 0 unconnected pads, 0 footprint errors; the 140 all-severity items are silkscreen cosmetics.
+**Status: v1 is a routing milestone, NOT fab-ready.** **58×40mm** (62×46 → 56×40 → 58×40; the last +2mm on the right reopened a corridor that a pad wall had sealed), 2-layer, 71 components + 4× M2.5 mounting holes 3.2mm in from each corner, every pad net-bound, GND poured both sides. (The frozen v1 board predates R28, the CE pull-up added 2026-07-16 — one more reason it stays a milestone; v2 includes it.) `kicad-cli pcb drc --refill-zones --severity-error`: 0 violations, 0 unconnected pads, 0 footprint errors; the 140 all-severity items are silkscreen cosmetics.
 
 > **Do not fabricate v1.** Every power net — VBUS, VSYS, VBAT, VOUT — is routed at **0.2mm**, against the ≥1mm this section requires for the ratings-table currents (a ~5× overload at 3A). A green DRC answered "are the nets connected?", never "are they correct?".
 >

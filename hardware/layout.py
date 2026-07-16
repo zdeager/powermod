@@ -102,6 +102,9 @@ FLOORPLAN.update({
 FLOORPLAN={r:((x+2.0 if x>=42.5 else x),y,rot) for r,(x,y,rot) in FLOORPLAN.items()}
 # post-shift absolute positions (bottom-edge J4 shuffle)
 FLOORPLAN.update({'SW1':(54.2,20.5,90),'TP1':(55.4,29.8,0),'TP5':(55.4,32.8,0)})
+# R28 added 2026-07-16 (CE pullup). Entry keeps the script runnable; the committed
+# v1 board predates it and is a frozen not-fab-ready milestone -- do not regenerate.
+FLOORPLAN.update({'R28':(19.0,14.0,0)})
 HOLES = [(3.2,3.2),(BOARD_W-3.2,3.2),(3.2,BOARD_H-3.2),(BOARD_W-3.2,BOARD_H-3.2)]
 
 # ------------------------------------------------------------- s-expr helpers

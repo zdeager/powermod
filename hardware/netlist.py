@@ -120,6 +120,7 @@ COMPONENTS.update({
  'R22':R('560','LED_BAT_A','D2_RED'), 'R23':R('560','LED_BAT_B','D2_GRN'),
  'R24':R('180k','FB','GND'), 'R25':R('1M','FB','FB_MID'), 'R26':R('620k','FB_MID','VOUT'),
  'R27':R('1k','3V3','CHG_JP'),          # supercap charge, behind JP1
+ 'R28':R('100k','VBUS','CHG_CE'),       # CE default-ON: TP4056 charges even with the MCU in reset/unprogrammed (2026-07-16); MCU PC4 push-pull overrides
  'C1': C('10u','VSYS','GND','C08'),  'C2': C('10u','VSYS','GND','C08'),
  'C3': C('22u','VOUT','GND','C08'),  'C4': C('22u','VOUT','GND','C08'),
  'C5': C('22u','VOUT','GND','C08'),
