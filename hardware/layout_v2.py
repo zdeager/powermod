@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# NOTE: this is the SHARED BOARD GENERATOR (gen_pcb, place_footprint, GND plane).
+# layout_mount.py imports it; the v2 FLOORPLAN/board size below is legacy default.
 """PowerMOD v2 layout generator — Raspberry Pi Zero form factor, 4 layers.
 
 Same electrical design as v1: reads connectivity from netlist.py, which is

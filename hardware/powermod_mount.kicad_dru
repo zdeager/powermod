@@ -1,6 +1,6 @@
 (version 1)
 
-# Custom DRC rules — the ENFORCEMENT half of trace widths.
+# Custom DRC rules for the mount board (width enforcement).
 #
 # Setting a net class track_width in the project only tells the router what to
 # aim for; KiCad's DRC does not check it. Without a rule like this, a board
@@ -12,10 +12,13 @@
 
 (rule "power rail escape width"
 	(condition "A.NetClass == 'Power'")
-	(constraint track_width (min 0.55mm))
-	# Per-pin escape into the In2 power planes, not bulk distribution: USB-C
-	# splits VBUS across 4 pins (~0.75A each of 3A), and the plane carries the
-	# aggregate. 0.55mm passes ~1.4A on its own.
+	(constraint track_width (min 0.30mm))
+	# Escape-neck minimum, not bulk width. The In2 planes + F.Cu pad-field pours
+	# carry the aggregate current; a trace only carries one pin's share (USB-C
+	# splits VBUS over 4 pins, ~0.75A each). 0.30mm at 1oz carries ~0.9A at 10C
+	# rise -- and it is the widest thing that physically enters a 0.65mm-pitch
+	# DFN pad or exits the USB-C pad field. The router still AIMS for 0.6mm
+	# (netclasses.py); this rule only stops silent hair-width regressions.
 )
 
 (rule "converter switch node width"
@@ -27,6 +30,7 @@
 
 (rule "logic rail width"
 	(condition "A.NetClass == 'Logic'")
-	(constraint track_width (min 0.35mm))
-	# 3V3 from the XC6206, 200mA ceiling.
+	(constraint track_width (min 0.25mm))
+	# 3V3 from the XC6206, 200mA ceiling; 0.25mm carries ~0.7A. The router aims
+	# for 0.4mm; the minimum accommodates the neck into 0.5mm-pitch QFN pads.
 )

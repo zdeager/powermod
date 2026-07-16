@@ -2,13 +2,17 @@ hardware/*-backups/
 hardware/*.dsn
 hardware/*.kicad_prl
 hardware/*.lck
+hardware/*.log
 hardware/*.rpt
 hardware/*.ses
 hardware/.history/
+hardware/_*.ses
 hardware/__pycache__/
+hardware/drc*.rpt
 hardware/drc_*.rpt
 hardware/freerouting.jar
 hardware/from_kicad.net
 hardware/hltest.ses
 hardware/v2*.log
 hardware/v2*.ses
+hardware/~*
