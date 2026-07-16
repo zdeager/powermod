@@ -142,7 +142,23 @@ IN (3) → VSYS + 1µF→GND; OUT (2) → **3V3** + 1µF→GND; VSS (1) → GND.
 9. XC6206, BSS138, J4 pin orders: **verify against the actual LCSC footprints** before ordering (flagged in §0).
 10. Order-time additions from the 2026-07-16 verification pass: **C382139 must be the ESOP-8 (exposed-pad) TP4056** to match the footprint; **D1/D2 PLCC4 pad map vs the actual LED part** (netlist.py carries the in-source VERIFY flag; red/green only per BOM); **Y1 must be the CL=12.5pF 3215 variant** (BM8563's on-die oscillator caps expect it); **JST pigtail polarity vs J3 pin 1 = VBAT** — vendors wire both ways, and a reversed cell destroys the TP4056 (no reverse protection, by design). Also: don't program via UPDI with a deeply discharged cell attached — the programmer's 3.3V can back-feed through the LDO body and Q2 into the cell.
 
-## 4. Layout (hardware/layout.py → powermod.kicad_pcb)
+## 4. Layout
+
+There are two boards. **v2 (`hardware/layout_v2.py` → `powermod_v2.kicad_pcb`) is the active design**; v1 is a superseded milestone kept for its lessons. Both read the same `netlist.py`, so ERC and the BOM apply to both.
+
+### 4.0 v2 — Raspberry Pi Zero / Witty Pi 4 form factor, 4-layer
+
+**65.0 × 30.0mm**, matching the Witty Pi 4 outline exactly (verified against UUGear's manual): 3mm corner radius, 4× **Ø2.75mm M2.5** mounting holes on the Pi's 58×23mm grid, 3.5mm in from each corner — so the board stacks on the same standoffs as a Pi Zero. (KiCad's stock M2.5 footprint drills 2.70mm; `layout_v2.py` patches it to 2.75mm.)
+
+**Stackup: F.Cu signal / In1.Cu solid GND plane / In2.Cu signal / B.Cu signal.** The inner GND plane is the reason for going to 4 layers — every GND pad connects with one via, and v1's island/stitching endgame structurally cannot recur. **In2 is a free routing layer, not power planes** — that was the pivotal finding: partitioning In2 into VBUS/VSYS/VOUT planes throttled the router to 8–9 unrouted (Freerouting won't route signals across a plane and left B.Cu nearly empty), while freeing In2 dropped it to **1**. Bulk power current instead rides local **F.Cu pad-field pours** at the two USB-C connectors and the OR→converter strap — a USB-C VBUS field is four 0.3mm pads at 0.5mm pitch that cannot escape as fat traces, so the field is poured and the pads are absorbed, exactly like GND.
+
+**Trace widths are enforced** (`netclasses.py` + `powermod_v2.kicad_dru`) — the router aims for 0.6mm on the power rails and DRC rejects anything below the class minimum, closing the exact gap that let v1 ship 0.2mm power. Widths are per-conductor (each escape carries one pin's share; the pours/planes carry the aggregate), so the minimums are escape-necks (Power ≥0.30, Switch ≥1.0, Logic ≥0.25mm), not bulk-distribution widths.
+
+Floorplan: power flows west→east — J1 (USB-C in) on the west edge → charger/OR → converter (centre, inductor north of U3) → J2 (USB-C out) beside the converter output on the south edge. Human/host interface (UPDI, button, STEMMA-QT, LEDs) along the north band; battery + test pads along the south. Placement is iterated by `place_relax.py` (overlap removal) under `place_check.py` (courtyard verification, cross-checked against KiCad's own `courtyards_overlap`). Build end-to-end with `./build_v2.sh`.
+
+**Status (2026-07-16, in progress):** placement clean (0 courtyard overlaps, verified against KiCad); J1/J2 both face outward at their edges, LEDs aligned on the north edge. Routing ~92%: Freerouting completes all but ~6 nets (VOUT, VBUS, 3V3, SDA last-mile), GND stitched to the In1 plane, **0 shorts / 0 dangling / 0 footprint errors** — the ~150 remaining DRC items are silkscreen-cosmetic. The last 6 nets are the classic autorouter tail (dense fine-pitch); they close with a topological router (TopoR) or ~30 min of interactive push-and-shove in KiCad, not more batch scripting. F.Cu power pad-field pours were tried and reverted: they fragment and need stitching, whereas plain enforced-width traces stay clean (gate `PADPOURS=1` to re-enable). <!-- STATUS_LINE -->
+
+### 4.1 v1 — 58×40mm 2-layer (superseded milestone)
 
 **Status: v1 is a routing milestone, NOT fab-ready.** **58×40mm** (62×46 → 56×40 → 58×40; the last +2mm on the right reopened a corridor that a pad wall had sealed), 2-layer, 71 components + 4× M2.5 mounting holes 3.2mm in from each corner, every pad net-bound, GND poured both sides. (The frozen v1 board predates R28, the CE pull-up added 2026-07-16 — one more reason it stays a milestone; v2 includes it.) `kicad-cli pcb drc --refill-zones --severity-error`: 0 violations, 0 unconnected pads, 0 footprint errors; the 140 all-severity items are silkscreen cosmetics.
 

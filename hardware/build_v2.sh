@@ -85,6 +85,7 @@ pcbnew.SaveBoard('powermod_v2.kicad_pcb', b)
 EOF
 
 python3 stitch_gnd.py $BOARD
+# python3 finish_v2.py $BOARD  # disabled: no pours = no fragments
 
 "$KPY" - <<'EOF'
 import pcbnew

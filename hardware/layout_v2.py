@@ -78,52 +78,56 @@ HOLE_FP = 'MountingHole:MountingHole_2.7mm_M2.5'
 # ends — so the north strip (y 0..6) and south strip (y 24..30) carry the small
 # passives and human-facing parts, and the middle band carries the power chain.
 FLOORPLAN = {
- # --- west short edge: USB-C input
+ # ============ WEST: input power (VBUS domain) ============
+ # J1 centred on the west short edge; everything VBUS clusters beside it.
  'J1': (5.40, 15.00, -90),
- # --- north strip: dividers, OR biasing, UPDI, host header, button, LEDs
- 'R2': (8.00, 1.40, 0), 'R3': (8.00, 3.00, 0),              # CC pulldowns for J1
- 'R8': (11.00, 1.40, 0), 'R9': (11.00, 3.00, 0), 'C11': (11.00, 4.60, 0),
- 'C12': (14.00, 1.40, 0), 'R10': (14.00, 3.00, 0), 'R13': (14.00, 4.60, 0),
- 'R11': (16.50, 0.87, 0),
- 'J5': (18.46, 3.26, 0),                                  # UPDI header
- 'R24': (24.00, 1.40, 0), 'R25': (24.00, 3.00, 0), 'R26': (24.00, 4.60, 0),
- 'JP2': (27.00, 2.00, 0),
- 'J4': (33.00, 3.50, 0),                                  # STEMMA QT / host I2C
- 'SW1': (42.00, 3.20, 0),
- 'D1': (49.00, 2.00, 0), 'D2': (55.00, 2.00, 0),
- 'R20': (46.73, 5.20, 0), 'R21': (48.74, 5.20, 0),
- 'R22': (53.00, 5.20, 0), 'R23': (55.00, 5.20, 0),
- # --- input / charger cluster (east of J1)
- 'C7': (11.32, 6.60, 0), 'C15': (14.08, 6.06, 0), 'R12': (15.62, 7.14, 0),
- 'U4': (15.16, 12.96, 0),                                 # TP4056
- 'C6': (12.30, 16.54, 0), 'R1': (14.86, 16.50, 0),
- 'JP1': (17.59, 17.07, 0), 'R27': (19.86, 16.75, 90),
- 'R28': (20.10, 11.50, 90),                                 # CHG_CE pullup to VBUS, beside U4
- # --- power-OR block
- 'Q1': (23.50, 11.00, 0), 'Q2': (22.61, 15.50, 0), 'Q3': (22.00, 20.00, 0),
- 'R14': (26.00, 20.00, 90),
- # --- converter: tight L1 loop, board centre
- 'U3': (33.00, 12.00, 0), 'L1': (33.00, 19.55, 0),
- 'C16': (29.50, 7.90, 90), 'C1': (29.50, 10.66, 90), 'C2': (29.50, 14.20, 90),
- 'C3': (36.50, 9.98, 90), 'C4': (36.45, 13.52, 90), 'C5': (38.55, 16.50, 90),
- # --- LDO + 3V3
- 'U5': (41.50, 10.04, 0), 'C8': (39.72, 12.62, 0), 'C9': (42.83, 12.62, 0),
- # --- MCU
- 'U2': (47.06, 12.50, 0), 'C14': (42.00, 7.73, 0),
- 'R15': (50.50, 8.00, 90), 'R16': (52.20, 8.00, 90),
- # --- RTC + crystal: east end, far from the L1 loop
- 'U1': (57.00, 10.00, 0), 'Y1': (57.00, 14.00, 0), 'C13': (61.50, 14.00, 90),
- 'D3': (53.50, 16.48, 0), 'D4': (53.50, 18.52, 0),
- 'R17': (56.00, 18.50, 90), 'R18': (57.70, 18.50, 90), 'R19': (59.40, 18.50, 90),
- # --- south strip: battery, test pads
- 'J3': (15.60, 25.70, 180),                               # battery JST
- 'R6': (18.67, 23.00, 90), 'R7': (20.00, 23.00, 90), 'C10': (22.00, 23.00, 90),
- 'TP2': (19.60, 27.00, 0), 'TP4': (22.80, 27.00, 0),        # BAT+ / GND
- 'TP3': (26.00, 27.00, 0), 'TP6': (29.50, 27.00, 0),        # VOUT / GND
- 'TP1': (57.00, 24.50, 0), 'TP5': (60.50, 24.50, 0),        # VBACKUP / GND
- # --- east short edge: USB-C output
- 'J2': (46.00, 24.50, 180),
- 'R4': (53.00, 22.00, 0), 'R5': (53.00, 23.60, 0),          # CC pullups for J2
+ 'R2': (11.80, 17.24, 0), 'R3': (11.80, 18.33, 0),   # CC Rd, at the port
+ 'C7': (11.52, 7.80, 0), 'C15': (14.28, 7.80, 0),    # VBUS bulk + HF
+ 'R12': (16.40, 7.80, 0),                            # VBUS bleed (Q2 gate release)
+ 'R8': (19.00, 8.00, 0), 'R9': (21.20, 8.00, 0),     # VBUS divider (cap C11 lives at the MCU)
+ 'U4': (15.40, 12.83, 0),                            # TP4056 charger
+ 'R1': (12.84, 16.15, 0),                            # PROG 1.2k = 1A
+ 'C6': (15.40, 17.00, 0),                            # BAT cap
+ 'R28': (17.96, 17.00, 0),                           # CE pull-up to VBUS
+ # ============ OR stage: VBUS/VBAT -> VSYS ============
+ 'Q1': (21.50, 12.00, 180),                             # VBUS pass PFET
+ 'C12': (24.80, 10.22, 90), 'R10': (26.40, 10.40, 90),   # Q1 gate RC (soft start)
+ 'R11': (24.80, 12.21, 90), 'Q3': (26.03, 14.99, 0), 'R13': (24.80, 17.77, 90),
+ 'Q2': (21.50, 17.50, 180),                            # VBAT pass PFET (passive)
+ # ============ CENTRE: buck-boost (VSYS -> VOUT) ============
+ # U3 rotated 180 so VIN pins face the OR stage (west) and VOUT pins face J2 (east).
+ 'U3': (33.00, 14.49, 180),
+ 'C1': (29.09, 13.51, 90), 'C2': (29.09, 17.06, 90),  # input caps, VIN side
+ 'C3': (37.84, 11.79, 90), 'C4': (39.95, 12.22, 90), 'C5': (37.80, 15.34, 90),  # output caps
+ 'C16': (39.60, 14.98, 90),                          # VINA bypass (<=0.22uF rule)
+ 'L1': (32.61, 8.16, 0),                            # inductor, south of U3
+ 'R14': (30.20, 19.38, 0),                            # CONV_EN pulldown, at U3's EN
+ 'R24': (37.19, 18.80, 0), 'R25': (39.20, 18.74, 0), 'R26': (42.28, 18.80, 0), 'JP2': (46.10, 18.73, 0),
+ # LDO hangs off VSYS south-west of the inductor; 3V3 runs east in the south channel
+ 'U5': (25.50, 21.41, 0), 'C8': (23.70, 23.99, 0), 'C9': (27.30, 23.99, 0),
+ # ============ EAST-CENTRE: MCU hub ============
+ 'U2': (46.20, 11.50, 0), 'C14': (42.00, 12.60, 90),
+ 'C11': (39.67, 20.26, 90), 'C10': (40.74, 19.07, 90),   # ADC sampling caps AT the pins
+ 'R15': (43.83, 19.05, 90), 'R16': (48.37, 19.05, 90),   # CHRG/STDBY pullups
+ # ============ EAST: RTC + backup (quiet corner, far from L1) ============
+ 'U1': (54.50, 11.50, 0), 'Y1': (52.00, 15.60, 0), 'C13': (59.60, 9.00, 0),
+ 'R17': (49.46, 19.05, 90), 'R18': (50.55, 19.05, 90), 'R19': (52.20, 20.20, 90),
+ 'D3': (57.40, 15.45, 0), 'D4': (57.40, 17.50, 0),
+ 'R27': (53.94, 19.80, 0), 'JP1': (56.66, 19.85, 0),
+ 'TP1': (60.80, 14.60, 0), 'TP5': (60.80, 18.00, 0),     # VBACKUP + GND pads
+ # ============ NORTH band: human/host interface ============
+ 'J5': (26.90, 27.00, 90),                            # UPDI
+ 'SW1': (15.50, 3.40, 0),
+ 'J4': (23.50, 3.40, 0),                             # STEMMA QT host I2C
+ 'D1': (40.00, 2.60, 0), 'R20': (39.00, 5.30, 0), 'R21': (41.00, 5.30, 0),
+ 'D2': (48.00, 2.60, 0), 'R22': (47.00, 5.30, 0), 'R23': (49.00, 5.30, 0),
+ # ============ SOUTH band: battery + output + test pads ============
+ 'J3': (15.50, 25.70, 180),                          # battery JST
+ 'R6': (19.03, 23.60, 0), 'R7': (21.04, 23.60, 0),   # VBAT divider
+ 'TP2': (19.60, 27.20, 0), 'TP4': (22.80, 27.20, 0), # BAT+ / GND
+ 'J2': (46.00, 25.40, 0),                          # USB-C out, beside the converter output
+ 'R4': (52.60, 25.40, 0), 'R5': (52.60, 27.00, 0),   # CC Rp
+ 'TP3': (35.40, 27.20, 0), 'TP6': (38.60, 27.20, 0), # VOUT / GND
 }
 
 # ------------------------------------------------------------- s-expr helpers
@@ -200,11 +204,18 @@ def gen_pcb(path):
     for ref,(x,y,rot) in FLOORPLAN.items():
         val, fp, lcsc, pins = COMPONENTS[ref]
         body.append(place_footprint(load_footprint(fp), ref, val, x, y, rot, padmap.get(ref,{})))
-    mh = load_footprint(HOLE_FP)
+    # Pi Zero / Witty Pi 4 mounting spec: 4x M2.5, drill 2.75mm, on the 58x23mm
+    # grid. KiCad's stock footprint drills 2.70mm -- patch it to match exactly.
+    mh = load_footprint(HOLE_FP).replace('(drill 2.7)', '(drill 2.75)')
     for n,(x,y) in enumerate(HOLES,1):
         body.append(place_footprint(mh, f'H{n}', 'M2.5', x, y, 0, {}))
-    for (x1,y1,x2,y2) in [(0,0,W,0),(W,0,W,H),(W,H,0,H),(0,H,0,0)]:
+    # Pi Zero / Witty Pi outline: 65x30 with 3mm corner radius.
+    R=3.0; K=R*(1-0.7071067811865476)
+    for (x1,y1,x2,y2) in [(R,0,W-R,0),(W,R,W,H-R),(W-R,H,R,H),(0,H-R,0,R)]:
         body.append(f' (gr_line (start {x1} {y1}) (end {x2} {y2}) (layer "Edge.Cuts") (width 0.1))')
+    for (sx,sy,mx,my,ex,ey) in [(0,R,K,K,R,0), (W-R,0,W-K,K,W,R),
+                                (W,H-R,W-K,H-K,W-R,H), (R,H,K,H-K,0,H-R)]:
+        body.append(f' (gr_arc (start {sx} {sy}) (mid {mx:.4f} {my:.4f}) (end {ex} {ey}) (layer "Edge.Cuts") (width 0.1))')
     poly = f'(polygon (pts (xy 0 0) (xy {W} 0) (xy {W} {H}) (xy 0 {H})))'
     # In1 = the solid GND plane, and nothing else. Every GND pad reaches it with
     # one via, which is the whole reason for going to four layers: v1's endgame
@@ -234,23 +245,39 @@ def gen_pcb(path):
   (connect_pads (clearance 0.3)) (min_thickness 0.25)
   (fill yes (thermal_gap 0.3) (thermal_bridge_width 0.4))
   {poly})''')
-    # In2 = power planes, partitioned along the power flow (west -> east).
-    #
-    # This only works in combination with THIN escapes (netclasses.py): the plane
-    # is the conductor and carries the aggregate current, while each pad needs
-    # only a short 0.6mm on-ramp into it. Planes with fat 1.1mm escapes was tried
-    # and failed (11 unrouted) — the escapes still could not fan out of the USB-C
-    # pads, so the planes bought nothing.
-    #
-    # The partition follows where each rail's pads actually cluster: VBUS around
-    # J1/charger (pads x 9..25), VSYS across the OR/converter (x 13..42), VOUT
-    # from the converter out to J2. A few outliers (JP2, TP3, C12) sit over a
-    # neighbouring plane and simply route on F/B instead.
-    for name,(x1,y1,x2,y2) in (('VBUS', (0,0,27,H)), ('VSYS', (27,0,42,H)), ('VOUT', (42,0,W,H))):
-        body.append(f''' (zone (net {codes[name]}) (net_name "{name}") (layer "In2.Cu") (hatch edge 0.5)
-  (connect_pads (clearance 0.3)) (min_thickness 0.25)
+    # Edge keepout frames (F/B, tracks only): Freerouting has no concept of the
+    # board's 0.5mm copper-to-edge constraint and will happily lay tracks 0.2mm
+    # from the outline. Thin frames keep it honest; vias/pads/pour unaffected.
+    # (NOT a full-board rule area -- that kills all vias; see the In1 lesson.)
+    M=0.55
+    frames=[(0,0,W,M),(0,H-M,W,H),(0,0,M,H),(W-M,0,W,H)]
+    for n,(x1,y1,x2,y2) in enumerate(frames):
+        for ly in ('F.Cu','B.Cu'):
+            body.append(f''' (zone (net 0) (net_name "") (layer "{ly}") (uuid "ko-edge-{n}-{ly[0]}")
+  (name "ko_edge_{n}_{ly[0]}") (hatch edge 0.5)
+  (connect_pads (clearance 0)) (min_thickness 0.25)
+  (keepout (tracks not_allowed) (vias allowed) (pads allowed) (copperpour allowed) (footprints allowed))
+  (fill (thermal_gap 0.5) (thermal_bridge_width 0.5))
+  (polygon (pts (xy {x1} {y1}) (xy {x2} {y1}) (xy {x2} {y2}) (xy {x1} {y2}))))''')
+    # Local F.Cu power pours (priority 1, above the GND pour): J1's VBUS field,
+    # J2's VOUT field, and the OR-output -> converter-input VSYS strap. USB-C
+    # power pads sit at 0.5mm pitch between CC/GND pads -- a 0.55mm-minimum
+    # Power trace cannot escape them laterally, and should not have to: pour the
+    # field and the pads are absorbed instead of routed (same mechanism that
+    # makes the GND pour absorb 55 GND pads).
+    if os.environ.get('PADPOURS'):     # off by default: pours fragment and
+        for name,(x1,y1,x2,y2) in (('VBUS',(1.0,8.8,13.0,21.2)),   # need stitching;
+                                    ('VOUT',(41.0,23.5,51.0,29.5)), # plain traces are
+                                    ('VSYS',(22.3,10.5,31.4,18.0))):# cleaner (v2-r12)
+            body.append(f''' (zone (net {codes[name]}) (net_name "{name}") (layer "F.Cu") (priority 1) (hatch edge 0.5)
+  (connect_pads (clearance 0.25)) (min_thickness 0.25)
   (fill yes (thermal_gap 0.3) (thermal_bridge_width 0.4))
   (polygon (pts (xy {x1} {y1}) (xy {x2} {y1}) (xy {x2} {y2}) (xy {x1} {y2}))))''')
+    # In2 left FREE for signals (v2-r8 experiment): with the F.Cu pad-field
+    # pours handling the USB-C escapes and In1 carrying GND, the In2 partition
+    # planes cost more routing freedom than they delivered -- Freerouting sat at
+    # 6-9 unrouted with them and left B.Cu nearly empty (11 segments). Power
+    # bulk rides the pours + 0.6mm class-width traces instead.
     body.append(')')
     open(path,'w').write('\n'.join(body))
 
