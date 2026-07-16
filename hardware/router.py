@@ -106,12 +106,14 @@ BUCKET=2.5
 class Obstacles:
     def __init__(self,pads):
         self.pads=pads
-        self.tracks={'F':[],'B':[]}
+        self.tracks={'F':[],'B':[],'I':[]}   # 'I' = In2.Cu, the free inner signal layer
         self.vias=[]
         self.idx={}   # (bx,by,layer) -> list of ('P',i)/('T',layer,i)/('V',i)
         for i,p in enumerate(pads):
             n,cx,cy,hx,hy,pl,_=p
-            lys=('F','B') if pl=='BOTH' else (pl,)
+            # SMD pads live only on their own outer layer; a THT/BOTH pad's drill
+            # passes through In2 too, so it blocks 'I'. SMD F/B pads do NOT.
+            lys=('F','B','I') if pl=='BOTH' else (pl,)
             for ly in lys:
                 self._put(cx-hx,cy-hy,cx+hx,cy+hy,ly,('P',i))
     def _put(self,x1,y1,x2,y2,layer,item):
@@ -123,7 +125,8 @@ class Obstacles:
         self._put(x1,y1,x2,y2,layer,('T',layer,len(self.tracks[layer])-1))
     def add_via(self,x,y,net):
         self.vias.append((x,y,net))
-        for ly in ('F','B'): self._put(x-0.5,y-0.5,x+0.5,y+0.5,ly,('V',len(self.vias)-1))
+        # a through-via spans every copper layer, so it obstructs F, B AND In2
+        for ly in ('F','B','I'): self._put(x-0.5,y-0.5,x+0.5,y+0.5,ly,('V',len(self.vias)-1))
     def blocked(self,net,w,layer,x,y,exempt=frozenset()):
         r=w/2+CLEAR
         if x<EDGE_MARGIN+w/2 or x>BW-EDGE_MARGIN-w/2 or y<EDGE_MARGIN+w/2 or y>BH-EDGE_MARGIN-w/2:
@@ -184,20 +187,29 @@ def route_edge(obs,net,w,p1,p2,allow_b=True):
         x,y,ly=n
         for dx,dy in ((1,0),(-1,0),(0,1),(0,-1)):
             m=(x+dx,y+dy,ly)
-            ng=g+ (1 if ly=='F' else 3)
+            # F and In2 are both cheap (In2 is the near-empty inner signal layer,
+            # ideal for long hauls); B costs more because it fragments the pours.
+            # (In2 is only ever entered on 4-layer boards; see USE_IN2 guard below.)
+            ng=g+ (1 if ly in ('F','I') else 3)
             if m in came or best.get(m,1e18)<=ng: continue
             fx,fy=gf(m[0]),gf(m[1])
             w_eff = min(w,0.25) if near(fx,fy) else w
             if obs.blocked(net,w_eff,ly,fx,fy,exempt): continue
             best[m]=ng; heapq.heappush(openq,(ng+h(m),ng,m,n))
         if allow_b:
-            other='B' if ly=='F' else 'F'
-            m=(x,y,other); ng=g+40
-            if m not in came and best.get(m,1e18)>ng:
-                fx,fy=gf(x),gf(y)
-                if (not obs.blocked(net,VIA_SIZE,other,fx,fy,exempt)
-                        and not obs.blocked(net,VIA_SIZE,ly,fx,fy,exempt)):
-                    best[m]=ng; heapq.heappush(openq,(ng+h(m),ng,m,n))
+            # a through-via can jump to any other copper layer; it must be clear
+            # on ALL layers it passes, since the drill spans them. In2 is only a
+            # routable target on 4-layer boards (USE_IN2); a 2-layer board (v1)
+            # keeps the original F<->B behaviour.
+            targets=('F','I','B') if globals().get('USE_IN2') else ('F','B')
+            fx,fy=gf(x),gf(y)
+            via_ok = not any(obs.blocked(net,VIA_SIZE,l,fx,fy,exempt) for l in targets)
+            if via_ok:
+                for other in targets:
+                    if other==ly: continue
+                    m=(x,y,other); ng=g+40
+                    if m not in came and best.get(m,1e18)>ng:
+                        best[m]=ng; heapq.heappush(openq,(ng+h(m),ng,m,n))
     if not seen_target: return None
     path=[]; n=seen_target
     while n: path.append(n); n=came[n]
@@ -229,10 +241,11 @@ def compress(path,p1,p2,w):
 # --------------------------------------------------------------------- main
 def parse_existing(obs, inv):
     s=open(BOARD).read()
-    for m in re.finditer(r'\(segment\s+\(start (-?[\d.]+) (-?[\d.]+)\)\s+\(end (-?[\d.]+) (-?[\d.]+)\)\s+\(width ([\d.]+)\)\s*(?:\(locked[^)]*\)\s*)?\(layer "([FB])\.Cu"\)\s+\(net "?([^")]+)"?\)', s):
+    LMAP={'F':'F','B':'B','In2':'I'}
+    for m in re.finditer(r'\(segment\s+\(start (-?[\d.]+) (-?[\d.]+)\)\s+\(end (-?[\d.]+) (-?[\d.]+)\)\s+\(width ([\d.]+)\)\s*(?:\(locked[^)]*\)\s*)?\(layer "(F|B|In2)\.Cu"\)\s+\(net "?([^")]+)"?\)', s):
         x1,y1,x2,y2,w,l,n=m.groups()
         net = inv.get(int(n),'?') if n.isdigit() else n
-        obs.add_track(l,float(x1),float(y1),float(x2),float(y2),float(w)/2,net)
+        obs.add_track(LMAP[l],float(x1),float(y1),float(x2),float(y2),float(w)/2,net)
     for m in re.finditer(r'\(via \(at (-?[\d.]+) (-?[\d.]+)\)[^)]*\(net (\d+)\)\)', s):
         pass
     for m in re.finditer(r'\(via\s+\(at (-?[\d.]+) (-?[\d.]+)\)\s+\(size [\d.]+\)\s+\(drill [\d.]+\)\s+\(layers "F\.Cu" "B\.Cu"\)\s*(?:\(locked[^)]*\)\s*)?\(net "?([^")]+)"?\)', s):
@@ -249,7 +262,7 @@ def emit_path(obs,codes,emitted,net,w,p1,p2,path):
             _,x1,y1,x2,y2,l,ww=pr
             if (x1,y1)==(x2,y2): continue
             obs.add_track(l,x1,y1,x2,y2,ww/2,net)
-            layer='F.Cu' if l=='F' else 'B.Cu'
+            layer={'F':'F.Cu','B':'B.Cu','I':'In2.Cu'}[l]
             emitted.append(f'  (segment (start {x1:.3f} {y1:.3f}) (end {x2:.3f} {y2:.3f}) (width {ww}) (layer "{layer}") (net {codes[net]}))')
         else:
             x,y=pr[1],pr[2]
