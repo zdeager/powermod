@@ -13,7 +13,7 @@ the Pi, where it clears the standoff gap. Single-sided, components up.
 Reuses layout_v2's generator (gen_pcb) by overriding its module globals.
 """
 import os, sys
-sys.path.insert(0, os.path.dirname(__file__) or '.')
+sys.path.insert(0, os.path.join(os.path.dirname(__file__) or '.', '..'))
 import layout_v2 as L
 
 L.BOARD_W, L.BOARD_H = 65.0, 40.0

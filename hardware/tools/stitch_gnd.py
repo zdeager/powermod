@@ -13,7 +13,7 @@ Legality reuses router.py's obstacle model (pads, tracks, vias, board edge) and
 guards mounting holes and PTH pads by hole-to-hole distance.
 """
 import os, re, sys, math, subprocess
-sys.path.insert(0, os.path.dirname(__file__) or '.')
+sys.path.insert(0, os.path.join(os.path.dirname(__file__) or '.', '..'))
 import router as R
 
 PITCH   = 2.5     # via grid pitch (mm)

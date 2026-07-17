@@ -13,7 +13,7 @@ Force-directed placement with electrical constraints:
 Writes the result into powermod.kicad_pcb via layout_v2.gen_pcb and can Freerouting-score.
 """
 import sys,os,math,json,random,subprocess,re
-sys.path.insert(0,os.path.dirname(__file__) or '.')
+sys.path.insert(0,os.path.join(os.path.dirname(__file__) or '.', '..'))
 import layout_v2 as L
 import layout_mount            # configure layout_v2 globals to the mount board
 from netlist import build_nets

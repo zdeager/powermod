@@ -19,3 +19,5 @@ hardware/~*
 # scratch convention: underscore-prefixed files are session scratch (except tracked _sizes.json)
 hardware/_*
 !hardware/_sizes.json
+**/__pycache__/
+.DS_Store

@@ -4,7 +4,7 @@ tall / user-facing parts are held on the bottom strip (y >= YMIN) so the Pi
 never covers them. Writes the cleaned FLOORPLAN back into layout_mount.py.
 """
 import os,sys,re,math,json
-sys.path.insert(0,os.path.dirname(__file__) or '.')
+sys.path.insert(0,os.path.join(os.path.dirname(__file__) or '.', '..'))
 import layout_mount   # sets layout_v2 globals to the mount board
 import layout_v2 as L
 

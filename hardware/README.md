@@ -42,6 +42,13 @@ contract, bring-up plan).
 
 ## Reusable tools
 
+All the layout/routing/placement scripts live in **`tools/`** (run them from
+this directory, e.g. `python3 tools/finish_board.py powermod.kicad_pcb`, so
+board paths and `_sizes.json` resolve; they add the parent dir to `sys.path`
+to import `netlist.py`). `netlist.py` itself stays here — it's the design
+source and writes the deliverables alongside itself. SPICE decks are in
+`tools/spice/`.
+
 Routing pipeline (for derivative boards — not this one):
 - **`fr_pipeline.py`** — strip copper + export Specctra DSN / import routed
   SES. Freerouting must never see a pre-routed board.
@@ -69,8 +76,13 @@ Placement:
 - **`place_check.py`** — courtyard-overlap + off-board report.
 - **`make_stencil.py`** — generates a bare user-facing-parts canvas for
   human I/O placement (its output board was removed once the layout froze).
-- `_sizes.json` — cached footprint courtyard sizes (tracked; the placer
-  reads it).
+- `_sizes.json` — cached footprint courtyard sizes (kept in this dir; the
+  placer reads it cwd-relative).
+
+SPICE (`tools/spice/`):
+- **`power_path_scenarios.py`** — behavioural ngspice model of the Q1/Q2/Q3
+  power path; runs the startup/switchover/unplug scenario matrix (see the
+  SPICE section of `PREFAB_AUDIT.md`). Needs `ngspice` on PATH.
 
 ## Hard-won rules (cost real time — don't relearn them)
 

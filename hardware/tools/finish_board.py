@@ -25,7 +25,7 @@ Require only the via pad (0.3mm r) inside the fill, and check foreign copper
 separately against the real obstacle set.
 """
 import sys, os, math
-sys.path.insert(0, os.path.dirname(__file__) or '.')
+sys.path.insert(0, os.path.join(os.path.dirname(__file__) or '.', '..'))
 import wx, pcbnew
 
 VIA_SIZE, VIA_DRILL, CLEAR = 0.6, 0.3, 0.21

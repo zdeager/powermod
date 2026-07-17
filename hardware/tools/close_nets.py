@@ -9,7 +9,7 @@ full refill + DRC: kept only if it drops the unconnected count and adds no new
 short/clearance/dangling error. Safe by construction — a bad route is reverted.
 """
 import os, re, sys, math, subprocess
-sys.path.insert(0, os.path.dirname(__file__) or '.')
+sys.path.insert(0, os.path.join(os.path.dirname(__file__) or '.', '..'))
 import router as R
 from stitch_gnd import board_size
 

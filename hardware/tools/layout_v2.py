@@ -59,7 +59,7 @@ floorplan designed around routing channels and power-domain geography — a huma
 judgement call, not another optimiser pass.
 """
 import os, re, sys
-sys.path.insert(0, os.path.dirname(__file__) or '.')
+sys.path.insert(0, os.path.join(os.path.dirname(__file__) or '.', '..'))
 from netlist import COMPONENTS, build_nets
 
 KISHARE = "/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints"
@@ -145,7 +145,7 @@ def matching(s, i):
 
 def load_footprint(lib_name):
     lib, name = lib_name.split(':')
-    base = os.path.dirname(__file__) or '.' if lib == 'powermod' else KISHARE  # local project lib
+    base = os.path.join(os.path.dirname(__file__) or '.', '..') if lib == 'powermod' else KISHARE  # local project lib
     return open(os.path.join(base, lib+'.pretty', name+'.kicad_mod')).read()
 
 # --------------------------------------------------------------------- build
@@ -287,5 +287,5 @@ def gen_pcb(path):
 if __name__=='__main__':
     missing = set(COMPONENTS) - set(FLOORPLAN)
     if missing: print("NOT PLACED:", sorted(missing)); sys.exit(1)
-    gen_pcb(os.path.join(os.path.dirname(__file__) or '.','powermod_v2.kicad_pcb'))
+    gen_pcb(os.path.join(os.path.join(os.path.dirname(__file__) or '.', '..'),'powermod_v2.kicad_pcb'))
     print(f"OK: {len(FLOORPLAN)} components on {BOARD_W}x{BOARD_H}mm, 4 layers")

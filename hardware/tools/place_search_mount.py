@@ -5,7 +5,7 @@ density spread out is the whole point). Anneal on ratsnest crossings, remove
 overlaps, and let Freerouting judge each candidate. Keep the best-routing one.
 """
 import os,sys,re,math,random,json,subprocess,time
-sys.path.insert(0,os.path.dirname(__file__) or '.')
+sys.path.insert(0,os.path.join(os.path.dirname(__file__) or '.', '..'))
 import layout_mount              # configures layout_v2 globals to the mount board
 import layout_v2 as L
 from netlist import build_nets

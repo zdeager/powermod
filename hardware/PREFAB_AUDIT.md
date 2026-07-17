@@ -53,6 +53,40 @@ can rerun the same checks.
    - **Hardening DONE (see open item (d))**: A4↔A9 tied with a 0.6mm F.Cu link;
      split is now A9 73% / A4 27%, contacts 0.84A each (was 1.15A).
 
+## SPICE verification — power path (2026-07-17)
+
+Behavioral ngspice model of the discrete power stage (Q1/Q2/Q3 OR-ing + the
+R10/R11/C12 soft-start) with the TPS63020 modelled as a constant-power load on
+VSYS (output regulated while VSYS > 1.8V). Deck: `tools/spice/`. FETs are
+behavioural (body diode + Vgs-gated switch) — good for switchover logic, not
+exact RDSon.
+
+**Passes — the OR-ing power path works:**
+- Battery-only cold start: VSYS comes up to ~VBAT via Q2. ✓
+- USB plug-in: VSYS bootstraps to VBUS−0.7 through Q1's body diode (powers the
+  MCU before firmware acts), then Q1 turns on with a ~3ms soft-start ramp
+  (C12 limits inrush). ✓
+- **VOUT holds its setpoint through USB unplug in every battery-backed case**
+  — 5V stays 5V, 3.3V stays 3.3V — because the TPS63020 keeps regulating down
+  to 1.8V input. Tested {5V,3.3V} out × {4.2V,3.0V batt} × {idle,active}. ✓
+- No-battery case correctly drops out on unplug (no cell = no backup).
+
+**Findings (none are board-changers):**
+1. **Unplug VSYS sag.** C12 holds Q1 on after the gate is released, and Q1
+   ties VBUS≈VSYS, which keeps Q2's *channel* off — so the battery briefly
+   feeds only through Q2's body diode and VSYS sags to ~VBAT−0.7. **Harmless:
+   VOUT is uninterrupted (converter masks it); MCU/RTC ride through.** A real
+   fix needs two changes (fast Q1-off AND faster VBUS bleed via smaller R12,
+   which costs standby current) — not worth it. **Bench-verify: scope VSYS
+   while yanking USB.**
+2. **Low-battery margin.** At 3.0V batt + 0.4A, the unplug sag reaches
+   VSYS≈2.03V — only ~0.2V above the converter's 1.8V floor. Fine for a Zero
+   2W; a heavier load/emptier cell would eat the margin. Reinforces the Zero
+   2W scope.
+3. **3.3V rail droops during the sag** → **use the ATtiny1616-SN (1.8V min),
+   not the -SF/-SFR (2.7V min)**, which would be marginal here. (Third
+   independent reason for the -SN.)
+
 ## BOM obligations (no DRC can catch these)
 
 - **LEDs D1/D2 — RESOLVED 2026-07-17.** Part = TOGIALED TJ-S3227 (LCSC
