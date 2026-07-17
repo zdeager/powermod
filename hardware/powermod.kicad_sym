@@ -437,7 +437,7 @@
   (pin passive line (at -6.35 0.0 0) (length 2.54) (name "P" (effects (font (size 1.0 1.0)))) (number "1" (effects (font (size 1.0 1.0)))))))
   (symbol "powermod:PM_U1" (pin_numbers hide) (in_bom yes) (on_board yes)
  (property "Reference" "U" (at 0 8.89 0) (effects (font (size 1.27 1.27))))
- (property "Value" "BM8563" (at 0 -8.89 0) (effects (font (size 1.27 1.27))))
+ (property "Value" "BM8563ESA" (at 0 -8.89 0) (effects (font (size 1.27 1.27))))
  (symbol "PM_U1_1_1" (rectangle (start -6.35 6.35) (end 6.35 -6.35) (stroke (width 0.15) (type default)) (fill (type background)))
   (pin passive line (at -8.89 3.81 0) (length 2.54) (name "OSCI" (effects (font (size 1.0 1.0)))) (number "1" (effects (font (size 1.0 1.0)))))
   (pin passive line (at -8.89 1.27 0) (length 2.54) (name "OSCO" (effects (font (size 1.0 1.0)))) (number "2" (effects (font (size 1.0 1.0)))))

@@ -27,14 +27,20 @@ FP = {
 }
 COMPONENTS = {
  # --- ICs ---
- 'U1': ('BM8563', 'Package_SO:SOIC-8_3.9x4.9mm_P1.27mm', 'C194063', {
+ # LCSC verified 2026-07-17: C194063 is the TSSOP-8 BM8563 (wrong package, OOS).
+ # C269877 = BM8563ESA, SOP-8 -> matches this SOIC-8 footprint. ~80k in stock.
+ 'U1': ('BM8563ESA', 'Package_SO:SOIC-8_3.9x4.9mm_P1.27mm', 'C269877', {
    '1':('OSCI','OSCI'), '2':('OSCO','OSCO'), '3':('INT','RTC_INT'), '4':('VSS','GND'),
    '5':('SDA','RTC_SDA'), '6':('SCL','RTC_SCL'), '7':('CLKOUT','NC'), '8':('VDD','RTC_VDD')}),
  # ATtiny1616 SOIC-20 (was ATtiny1617 QFN-24): 1.27mm pitch, no exposed pad,
  # hand-solderable, far easier to route. Pinout = KiCad ATtiny406-S base (verified
  # against the symbol lib). 4 signals reassigned off pins the 20-pin part lacks
  # (PB6/PB7/PC4/PC5 -> PA6/PA7/PC0/PC1); zero spare pins now. LCSC to confirm.
- 'U2': ('ATtiny1616', 'Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm', 'C2891852', {
+ # LCSC verified 2026-07-17: C2891852 was WRONG (a 4-pin 1.2mm header, not an MCU).
+ # C614136 = ATTINY1616-SN (SOIC-20, 20MHz, 1.8-5.5V) — correct part, 0 stock at
+ # LCSC at check time; in-stock sub = C145558 ATTINY1616-SFR (16MHz, 2.7V MIN
+ # supply — thin margin at battery-empty, prefer the -SN from Mouser/DigiKey).
+ 'U2': ('ATtiny1616', 'Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm', 'C614136', {
    '1':('VCC','3V3'), '2':('PA4/VBAT_SENSE','VBAT_DIV'), '3':('PA5/VBUS_SENSE','VBUS_DIV'),
    '4':('PA6/LED_BAT_A','LED_BAT_A'), '5':('PA7/LED_BAT_B','LED_BAT_B'),
    '6':('PB5/CHG_STDBY','CHG_STDBY'), '7':('PB4/CHG_CHRG','CHG_CHRG'),

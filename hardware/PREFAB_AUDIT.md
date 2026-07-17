@@ -39,9 +39,18 @@ can rerun the same checks.
   Order yellow-green (Vf≈2.1V) or drop R21/R23 to ~220Ω.
 - **Crystal must be CL=12.5pF** (BM8563 internal load caps assume it; a
   6/7pF 3215 part runs fast).
-- **LCSC numbers unverified offline**: confirm C15483=TPS63020DSJR,
-  C382139=TP4056(CE variant), C2891852=ATtiny1616-SN, C176756=AON7407,
-  C5446=XC6206P332MR, C52895=BSS138, C194063=BM8563.
+- **LCSC numbers VERIFIED against lcsc.com 2026-07-17** — two were wrong and
+  are fixed in netlist.py:
+  | Part | Number | Verdict |
+  |---|---|---|
+  | TPS63020DSJR | C15483 | ✓ (VSON-14-EP 3x4, in stock) |
+  | TP4056 | C382139 | ✓ (TPOWER, ESOP-8, 60k stock) |
+  | ATtiny1616 | ~~C2891852~~ → **C614136** | old # was a 4-pin 1.2mm header(!). C614136 = ATTINY1616-SN, 0 LCSC stock at check; sub C145558 (-SFR, 16MHz, **2.7V min** — thin at battery-empty) or buy -SN at Mouser/DigiKey |
+  | AON7407 | C176756 | ✓ (AOS, DFN-8 3x3, 24k stock) |
+  | XC6206P332MR-G | C5446 | ✓ (SOT-23, 206k stock) |
+  | BSS138 | C52895 | ✓ (onsemi, SOT-23, 39k stock) |
+  | BM8563 | ~~C194063~~ → **C269877** | old # was the TSSOP-8 (doesn't fit our SOIC-8 footprint) and OOS. C269877 = BM8563ESA SOP-8, 80k stock |
+  Stock numbers are point-in-time — recheck at order.
 
 ## Firmware contract (hardware assumes these)
 
