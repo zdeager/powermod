@@ -21,3 +21,4 @@ hardware/_*
 !hardware/_sizes.json
 **/__pycache__/
 .DS_Store
+hardware/*.zip
