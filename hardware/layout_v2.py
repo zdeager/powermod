@@ -145,7 +145,8 @@ def matching(s, i):
 
 def load_footprint(lib_name):
     lib, name = lib_name.split(':')
-    return open(os.path.join(KISHARE, lib+'.pretty', name+'.kicad_mod')).read()
+    base = os.path.dirname(__file__) or '.' if lib == 'powermod' else KISHARE  # local project lib
+    return open(os.path.join(base, lib+'.pretty', name+'.kicad_mod')).read()
 
 # --------------------------------------------------------------------- build
 def pad_net_map():

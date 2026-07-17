@@ -71,19 +71,25 @@ COMPONENTS = {
    '1':('A_RED','D2_RED'), '2':('K_RED','GND'), '3':('A_GRN','D2_GRN'), '4':('K_GRN','GND')}),
  'D3': ('1N4148WS', FP['SOD'], None, {'1':('K','RTC_VDD'), '2':('A','3V3')}),
  'D4': ('1N4148WS', FP['SOD'], None, {'1':('K','RTC_VDD'), '2':('A','VBACKUP')}),
+ # D5 blocks the supercap back-draining through R27 into a dead 3V3 rail
+ # (~3mA vs the RTC's 0.25uA — found in the 2026-07-17 pre-fab audit).
+ # Charge path is now 3V3 -> R27 -> D5 -> JP1 -> VBACKUP; ceiling ~2.85V.
+ 'D5': ('1N4148WS', FP['SOD'], None, {'1':('K','CHG_JPD'), '2':('A','CHG_JP')}),
  'Y1': ('32.768kHz', 'Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm', None, {
    '1':('X1','OSCI'), '2':('X2','OSCO')}),
  # --- connectors / electromech ---
- 'J1': ('USB_C_IN', 'Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12', None, {
-   'A1':('GND','GND'),'B1':('GND','GND'),'A12':('GND','GND'),'B12':('GND','GND'),
-   'A4':('VBUS','VBUS'),'B4':('VBUS','VBUS'),'A9':('VBUS','VBUS'),'B9':('VBUS','VBUS'),
+ # merged-pad USB-C: reversible twins (A4≡B9, A9≡B4, A1≡B12, A12≡B1) share ONE pad,
+ # so VBUS/GND are single pads -> no coincident-pad DRC flags, cleaner escape.
+ 'J1': ('USB_C_IN', 'powermod:USB_C_Receptacle_TYPE-C_16P_PowerMerged', None, {
+   'A1':('GND','GND'),'A12':('GND','GND'),
+   'A4':('VBUS','VBUS'),'A9':('VBUS','VBUS'),
    'A5':('CC1','CC1_IN'),'B5':('CC2','CC2_IN'),
-   'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'S1':('SHIELD','GND')}),
- 'J2': ('USB_C_OUT', 'Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12', None, {
-   'A1':('GND','GND'),'B1':('GND','GND'),'A12':('GND','GND'),'B12':('GND','GND'),
-   'A4':('VBUS','VOUT'),'B4':('VBUS','VOUT'),'A9':('VBUS','VOUT'),'B9':('VBUS','VOUT'),
+   'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'SH':('SHIELD','GND')}),
+ 'J2': ('USB_C_OUT', 'powermod:USB_C_Receptacle_TYPE-C_16P_PowerMerged', None, {
+   'A1':('GND','GND'),'A12':('GND','GND'),
+   'A4':('VBUS','VOUT'),'A9':('VBUS','VOUT'),
    'A5':('CC1','CC1_OUT'),'B5':('CC2','CC2_OUT'),
-   'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'S1':('SHIELD','GND')}),
+   'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'SH':('SHIELD','GND')}),
  'J3': ('JST_PH_2', 'Connector_JST:JST_PH_S2B-PH-K_1x02_P2.00mm_Horizontal', None, {
    '1':('BAT+','VBAT'), '2':('BAT-','GND')}),
  'J4': ('STEMMA_QT', 'Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal', None, {
@@ -92,7 +98,7 @@ COMPONENTS = {
    '1':('UPDI','UPDI'), '2':('3V3','3V3'), '3':('GND','GND')}),
  'SW1':('BUTTON', 'Button_Switch_SMD:SW_SPST_PTS647_Sx50', None, {
    '1':('A','BUTTON'), '2':('B','GND')}),
- 'JP1':('CHG_JUMPER', FP['SJ'], None, {'1':('A','CHG_JP'), '2':('B','VBACKUP')}),
+ 'JP1':('CHG_JUMPER', FP['SJ'], None, {'1':('A','CHG_JPD'), '2':('B','VBACKUP')}),
  'JP2':('VSEL_JUMPER', FP['SJ'], None, {'1':('A','FB_MID'), '2':('B','VOUT')}),
  'L1': ('1.5uH_4.5A', 'Inductor_SMD:L_Sumida_CDMC6D28_7.25x6.5mm', None, {  # footprint per chosen part
    '1':('1','L1N'), '2':('2','L2')}),
@@ -265,9 +271,11 @@ if __name__=='__main__':
     open(os.path.join(d,'sym-lib-table'),'w').write(
       '(sym_lib_table (version 7)\n  (lib (name "powermod")(type "KiCad")(uri "${KIPRJMOD}/powermod.kicad_sym")(options "")(descr "generated")))\n')
     libs=sorted({c[1].split(':')[0] for c in COMPONENTS.values()})
+    def _uri(l):  # 'powermod' is a local project library; the rest are KiCad stock
+        return f"${{KIPRJMOD}}/{l}.pretty" if l=='powermod' else f"${{KICAD10_FOOTPRINT_DIR}}/{l}.pretty"
     open(os.path.join(d,'fp-lib-table'),'w').write(
       '(fp_lib_table (version 7)\n'+''.join(
-        f'  (lib (name "{l}")(type "KiCad")(uri "${{KICAD10_FOOTPRINT_DIR}}/{l}.pretty")(options "")(descr ""))\n'
+        f'  (lib (name "{l}")(type "KiCad")(uri "{_uri(l)}")(options "")(descr ""))\n'
         for l in libs)+')\n')
     if not os.path.exists(os.path.join(d,'powermod.kicad_pro')):
         open(os.path.join(d,'powermod.kicad_pro'),'w').write('{"meta":{"filename":"powermod.kicad_pro","version":3}}')
