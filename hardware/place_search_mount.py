@@ -11,7 +11,7 @@ import layout_v2 as L
 from netlist import build_nets
 
 KPY='/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3'
-BOARD='powermod_mount.kicad_pcb'; DSN='powermod_mount.dsn'
+BOARD='powermod.kicad_pcb'; DSN='powermod.dsn'
 W,H=L.BOARD_W,L.BOARD_H
 SIZE=json.load(open('_sizes.json'))
 HOLES=L.HOLES; HOLE_R=3.05; EDGE=0.4; GAP=0.2
@@ -158,6 +158,6 @@ def main(N=12):
         res.append((u,cr,name,p)); print(f"  {name}: cross={cr} -> {u} unrouted  ({time.time()-t0:.0f}s)",flush=True)
     res.sort(); u,cr,name,p=res[0]
     print(f"\nBEST: {name}  {u} unrouted",flush=True)
-    L.FLOORPLAN=p; L.gen_pcb('powermod_mount_best.kicad_pcb')
+    L.FLOORPLAN=p; L.gen_pcb('powermod_best.kicad_pcb')
     open('mount_best.py','w').write("UNROUTED=%d\nFLOORPLAN=%r\n"%(u,p))
 if __name__=='__main__': main()

@@ -144,4 +144,4 @@ def main(board):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1] if len(sys.argv) > 1 else 'powermod_mount.kicad_pcb')
+    main(sys.argv[1] if len(sys.argv) > 1 else 'powermod.kicad_pcb')

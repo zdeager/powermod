@@ -1,6 +1,6 @@
 # PowerMOD mount board — pre-fab audit (2026-07-17)
 
-Full verification of `powermod_mount.kicad_pcb` against `netlist.py`, datasheets,
+Full verification of `powermod.kicad_pcb` (renamed from powermod_mount 2026-07-17) against `netlist.py`, datasheets,
 and fab constraints. Method + findings recorded so a re-audit after any change
 can rerun the same checks.
 

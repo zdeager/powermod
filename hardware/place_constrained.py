@@ -10,7 +10,7 @@ Force-directed placement with electrical constraints:
   - the converter power stage is a RIGID block (the hand-tuned layout) moved as a unit.
   - user I/O + mounting holes are fixed anchors; hole/edge keep-outs apply to all.
 
-Writes the result into powermod_mount via layout_v2.gen_pcb and can Freerouting-score.
+Writes the result into powermod.kicad_pcb via layout_v2.gen_pcb and can Freerouting-score.
 """
 import sys,os,math,json,random,subprocess,re
 sys.path.insert(0,os.path.dirname(__file__) or '.')
@@ -117,6 +117,6 @@ if __name__=='__main__':
     pos=place()
     pos=P.relax(P.relax(pos))          # final overlap cleanup (respects PIN)
     print("overlaps:",P.overlaps(pos))
-    L.FLOORPLAN=pos; L.gen_pcb('powermod_mount.kicad_pcb')
+    L.FLOORPLAN=pos; L.gen_pcb('powermod.kicad_pcb')
     open('mount_best.py','w').write("UNROUTED=0\nFLOORPLAN=%r\n"%pos)
     print("wrote placement")

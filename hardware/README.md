@@ -1,55 +1,92 @@
 # PowerMOD hardware
 
-Machine-generated PCB design. The electrical design is defined in code
-(`netlist.py`); layout and routing are scripted around KiCad + Freerouting.
+Machine-generated PCB design for a Raspberry Pi Zero 2 W power scheduler /
+UPS / battery board. The electrical design is defined in code (`netlist.py`);
+the board was laid out and routed with the scripted KiCad + Freerouting
+toolchain below, then hand-finished.
+
+## The board — `powermod.kicad_pcb` (final)
+
+65 × 40 mm, 4-layer (F.Cu signal / In1 solid GND / In2 signal / B.Cu signal).
+Bolts under a Pi Zero 2 W (holes on the Pi's 58×23 grid, flush to the N+W
+edges); the Pi covers y0–30, and all user-facing parts (USB-C out, battery,
+button, LEDs, jumpers, test pads) sit on the exposed strip below it.
+Single-sided assembly.
+
+One KiCad project, one stem: `powermod.kicad_pro` (netclasses + DRC config),
+`powermod.kicad_sch` (generated schematic), `powermod.kicad_pcb` (board),
+`powermod.kicad_dru` (width-enforcement rules — net classes alone are NOT
+checked by DRC).
+
+**Status: fab-ready.** Fully routed, 0 unconnected, 0 clearance; the only DRC
+items are 4 `track_width` flags on the L2/L1N necks at U3's 0.65 mm pins,
+which physically cannot be 1.0 mm wide. Pre-fab audit (pad-for-pad netlist
+diff, datasheet pin checks, operating-point math, the D5 supercap fix):
+see **`PREFAB_AUDIT.md`** — read it before ordering (BOM traps, firmware
+contract, bring-up plan).
+
+> **Do NOT regenerate this board from `netlist.py`.** Placement and the
+> USB-C fine-pitch escapes are hand-done. Make changes surgically on
+> `powermod.kicad_pcb` and update `netlist.py` in parallel, then prove they
+> agree with a pad-diff (the audit doc describes it).
 
 ## Electrical source of truth
-- **`netlist.py`** — every component, pin, and net (72 components, 44 nets).
-  Run it to (re)generate the schematic + netlist + symbol/footprint tables:
-  `powermod.kicad_sch`, `powermod.net`, `powermod.kicad_sym`,
-  `sym-lib-table`, `fp-lib-table`. Has a self-test (golden vectors, pin counts).
-  ERC-clean in KiCad; the schematic project is `powermod.kicad_pro`.
 
-## Active board — the "mount" board (76 × 46 mm)
-Bigger-than-Pi board that still bolts to a Pi Zero 2 W (holes on the Pi's
-58×23 grid, flush to the N+W edges); user-facing parts sit on the exposed
-strip past the Pi. Single-sided.
-- **`layout_mount.py`** — the floorplan (component positions) → generates
-  `powermod_mount.kicad_pcb`. User-placed I/O is pinned; circuit spreads freely.
-- **`mount_best.py`** — best placement found by the search (apply + route).
-- **`powermod_stencil.kicad_pcb`** — bare canvas of just the user-facing parts,
-  used to let a human place connectors/LEDs/jumpers, then read back (`make_stencil.py`).
-- `powermod_mount.kicad_pro` / `.kicad_dru` — project + width-enforcement rules.
-
-Status: ~95% autorouted. The last ~4 nets (USB-C/QFN fine-pitch escapes) are the
-known autorouter wall — they need interactive routing or rip-up to finish.
+- **`netlist.py`** — every component, pin, and net (73 components, 45 nets).
+  Run it to (re)generate `powermod.kicad_sch`, `powermod.net`,
+  `powermod.kicad_sym`, `sym-lib-table`, `fp-lib-table`. Has a self-test
+  (golden vectors, pin counts).
+- **`powermod.pretty/`** — local footprint lib: the merged-pad USB-C
+  receptacle (reversible twin pads share one pad, so VBUS/GND escape cleanly
+  and DRC sees no coincident-pad conflicts). Required to open the board.
 
 ## Reusable tools
-- **`router.py`** — grid A* + obstacle model, routes on F/In2/B (In2 = 4-layer).
-- **`fr_pipeline.py`** — strip copper + export Specctra DSN / import routed SES.
-- **`netclasses.py`** — inject net classes (trace-width targets) into a `.kicad_pro`.
-  (Enforcement needs the `.kicad_dru` — net classes alone are NOT checked by DRC.)
-- **`stitch_gnd.py`** — GND stitching vias to the In1 plane.
-- **`close_nets.py`** — route leftover nets with the In2 A*, DRC-validated.
-- **`place_check.py`** — courtyard-overlap + off-board report (agrees with KiCad).
-- **`relax_mount.py`** — overlap-removal for the mount floorplan (pins user I/O).
-- **`place_search_mount.py`** — placement search (spread + crossing-anneal),
-  scored by Freerouting.
-- **`layout_v2.py`** — the shared board GENERATOR (`gen_pcb`, footprint placement,
-  GND plane + In2 keepout). `layout_mount` imports it; its own floorplan is legacy.
-- `freerouting.jar` (gitignored, ~55MB) — the autorouter. Needs Java 21+, run
-  with `-Djava.awt.headless=true` or it hangs on macOS.
-- `_sizes.json` — cached footprint courtyard sizes (regenerable).
 
-## Rebuild the board
-```
-python3 netclasses.py powermod_mount.kicad_pro   # width targets
-python3 layout_mount.py                            # placement -> board
-# route: fr_pipeline export -> freerouting -> import -> stitch_gnd -> DRC
-```
+Routing pipeline (for derivative boards — not this one):
+- **`fr_pipeline.py`** — strip copper + export Specctra DSN / import routed
+  SES. Freerouting must never see a pre-routed board.
+- `freerouting.jar` (gitignored, ~55 MB) — the autorouter. Java 21+, run with
+  `-Djava.awt.headless=true` or it hangs on macOS.
+- **`finish_board.py`** — post-route finisher: SES import → GND stitching →
+  floating-pour-island tie vias → zone refill. Then DRC with
+  `--refill-zones` (without it you get hundreds of phantom violations).
+- **`stitch_gnd.py`** — the 2.5 mm GND stitching-via grid to the In1 plane.
+- **`close_nets.py`** — route leftover nets with the In2-capable grid A*,
+  each route validated by refill+DRC and reverted if it doesn't improve.
+- **`router.py`** — grid A* + obstacle model (F/In2/B) used by the above.
+- **`netclasses.py`** — inject net-class width targets into a `.kicad_pro`.
+
+Placement:
+- **`layout_v2.py`** — the board generator (`gen_pcb`: footprints, GND
+  planes, keepouts). `layout_mount.py` configures it for this board's
+  outline/holes/pinned I/O.
+- **`place_constrained.py`** — constraint-aware force-directed placer
+  (net springs, padded repulsion, wide-net/IC halos, rigid converter block).
+- **`place_search_mount.py`** / **`relax_mount.py`** — placement search
+  scored by Freerouting / overlap relaxer. **`mount_best.py`** — placer
+  output snapshot (stale vs the hand-edited board; the board is
+  authoritative).
+- **`place_check.py`** — courtyard-overlap + off-board report.
+- **`make_stencil.py`** — generates a bare user-facing-parts canvas for
+  human I/O placement (its output board was removed once the layout froze).
+- `_sizes.json` — cached footprint courtyard sizes (tracked; the placer
+  reads it).
+
+## Hard-won rules (cost real time — don't relearn them)
+
+- A green DRC only checks rules that exist: keep `powermod.kicad_dru` next
+  to the board, and after any rename/move confirm the 4 known `track_width`
+  flags still fire (if they vanish, the rules got orphaned, not fixed).
+- Netclasses live in the `.kicad_pro`. A board file copied away from its
+  project routes everything at 0.2 mm and "routes fully" — a fake win.
+- Zone fills are stored in the file: refill before DRC or judging renders.
+- Scripted tracks don't bind to large connector pads (USB-C, bar pads) —
+  those few escapes are interactive-routing territory; small pads bind fine.
 
 ## History
-v1 (58×40, 2-layer) and v2 (65×30, Pi footprint) were removed: v1 had a real
-defect (3A rails routed at 0.2mm — see the width lesson in
-`powermod-schematic.md`), and v2 was superseded by the mount board. The lessons
-live in the docs and the tools, not stale board files.
+
+v1 (58×40, 2-layer) had 3A rails at 0.2 mm (the `.kicad_dru` lesson); v2
+(65×30) was superseded by this board; the QFN-package MCU was swapped for the
+SOIC-20 ATtiny1616 to break the routing wall; `powermod_mount.*` was renamed
+to `powermod.*` once it became the only board (2026-07-17). Lessons live in
+the tools and `PREFAB_AUDIT.md`, not in stale board files.

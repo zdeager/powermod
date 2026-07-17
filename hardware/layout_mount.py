@@ -102,5 +102,5 @@ if __name__ == '__main__':
     missing = set(L.COMPONENTS) - set(L.FLOORPLAN)
     if missing:
         print("NOT PLACED:", sorted(missing)); sys.exit(1)
-    L.gen_pcb('powermod_mount.kicad_pcb')
+    L.gen_pcb('powermod.kicad_pcb')
     print(f"OK: {len(L.FLOORPLAN)} components on {L.BOARD_W}x{L.BOARD_H}mm mount board")
