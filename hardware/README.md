@@ -52,8 +52,8 @@ source and writes the deliverables alongside itself. SPICE decks are in
 Routing pipeline (for derivative boards — not this one):
 - **`fr_pipeline.py`** — strip copper + export Specctra DSN / import routed
   SES. Freerouting must never see a pre-routed board.
-- `freerouting.jar` (gitignored, ~55 MB) — the autorouter. Java 21+, run with
-  `-Djava.awt.headless=true` or it hangs on macOS.
+- `tools/freerouting.jar` (gitignored, ~55 MB) — the autorouter. Java 21+, run
+  with `-Djava.awt.headless=true` or it hangs on macOS.
 - **`finish_board.py`** — post-route finisher: SES import → GND stitching →
   floating-pour-island tie vias → zone refill. Then DRC with
   `--refill-zones` (without it you get hundreds of phantom violations).

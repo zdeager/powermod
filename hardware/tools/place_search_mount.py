@@ -134,7 +134,7 @@ def score(pos,passes=2):
     subprocess.run([KPY,'fr_pipeline.py','export',BOARD],capture_output=True)
     best=99
     for i in range(passes):
-        r=subprocess.run(['java','-Djava.awt.headless=true','-jar','freerouting.jar','-de',DSN,'-do',f'_ms{i}.ses','-mp','50'],capture_output=True,text=True,timeout=200)
+        r=subprocess.run(['java','-Djava.awt.headless=true','-jar',os.path.join(os.path.dirname(__file__),'freerouting.jar'),'-de',DSN,'-do',f'_ms{i}.ses','-mp','50'],capture_output=True,text=True,timeout=200)
         m=re.findall(r'\((\d+) unrouted',r.stdout+r.stderr)
         if m: best=min(best,int(m[-1]))
     return best

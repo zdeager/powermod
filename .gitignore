@@ -10,7 +10,7 @@ hardware/_*.ses
 hardware/__pycache__/
 hardware/drc*.rpt
 hardware/drc_*.rpt
-hardware/freerouting.jar
+hardware/tools/freerouting.jar
 hardware/from_kicad.net
 hardware/hltest.ses
 hardware/v2*.log
