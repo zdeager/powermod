@@ -16,3 +16,6 @@ hardware/hltest.ses
 hardware/v2*.log
 hardware/v2*.ses
 hardware/~*
+# scratch convention: underscore-prefixed files are session scratch (except tracked _sizes.json)
+hardware/_*
+!hardware/_sizes.json

@@ -30,16 +30,20 @@ COMPONENTS = {
  'U1': ('BM8563', 'Package_SO:SOIC-8_3.9x4.9mm_P1.27mm', 'C194063', {
    '1':('OSCI','OSCI'), '2':('OSCO','OSCO'), '3':('INT','RTC_INT'), '4':('VSS','GND'),
    '5':('SDA','RTC_SDA'), '6':('SCL','RTC_SCL'), '7':('CLKOUT','NC'), '8':('VDD','RTC_VDD')}),
- 'U2': ('ATtiny1617', 'Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm', 'C614176', {
-   '1':('PA2/BUTTON','BUTTON'), '2':('PA3/CONV_EN','CONV_EN'), '3':('GND','GND'),
-   '4':('VDD','3V3'), '5':('PA4/VBAT_SENSE','VBAT_DIV'), '6':('PA5/VBUS_SENSE','VBUS_DIV'),
-   '7':('PA6','NC'), '8':('PA7','NC'), '9':('PB7/LED_BAT_B','LED_BAT_B'),
-   '10':('PB6/LED_BAT_A','LED_BAT_A'), '11':('PB5/CHG_STDBY','CHG_STDBY'),
-   '12':('PB4/CHG_CHRG','CHG_CHRG'), '13':('PB3/LED_PWR_B','LED_PWR_B'),
-   '14':('PB2/LED_PWR_A','LED_PWR_A'), '15':('PB1/SDA','SDA'), '16':('PB0/SCL','SCL'),
-   '17':('PC0','NC'), '18':('PC1','NC'), '19':('PC2/RTC_INT','RTC_INT'),
-   '20':('PC3/Q1_GATE_DRV','Q1_GATE_DRV'), '21':('PC4/CHG_CE','CHG_CE'), '22':('PC5/RTC_SCL','RTC_SCL'),
-   '23':('PA0/UPDI','UPDI'), '24':('PA1/RTC_SDA','RTC_SDA'), '25':('PAD','GND')}),
+ # ATtiny1616 SOIC-20 (was ATtiny1617 QFN-24): 1.27mm pitch, no exposed pad,
+ # hand-solderable, far easier to route. Pinout = KiCad ATtiny406-S base (verified
+ # against the symbol lib). 4 signals reassigned off pins the 20-pin part lacks
+ # (PB6/PB7/PC4/PC5 -> PA6/PA7/PC0/PC1); zero spare pins now. LCSC to confirm.
+ 'U2': ('ATtiny1616', 'Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm', 'C2891852', {
+   '1':('VCC','3V3'), '2':('PA4/VBAT_SENSE','VBAT_DIV'), '3':('PA5/VBUS_SENSE','VBUS_DIV'),
+   '4':('PA6/LED_BAT_A','LED_BAT_A'), '5':('PA7/LED_BAT_B','LED_BAT_B'),
+   '6':('PB5/CHG_STDBY','CHG_STDBY'), '7':('PB4/CHG_CHRG','CHG_CHRG'),
+   '8':('PB3/LED_PWR_B','LED_PWR_B'), '9':('PB2/LED_PWR_A','LED_PWR_A'),
+   '10':('PB1/SDA','SDA'), '11':('PB0/SCL','SCL'),
+   '12':('PC0/CHG_CE','CHG_CE'), '13':('PC1/RTC_SCL','RTC_SCL'),
+   '14':('PC2/RTC_INT','RTC_INT'), '15':('PC3/Q1_GATE_DRV','Q1_GATE_DRV'),
+   '16':('PA0/UPDI','UPDI'), '17':('PA1/RTC_SDA','RTC_SDA'),
+   '18':('PA2/BUTTON','BUTTON'), '19':('PA3/CONV_EN','CONV_EN'), '20':('GND','GND')}),
  'U3': ('TPS63020DSJR', 'Package_SON:VSON-14-1EP_3x4.45mm_P0.65mm_EP1.6x4.2mm', 'C15483', {
    '1':('VINA','VSYS'), '2':('GND','GND'), '3':('FB','FB'), '4':('VOUT','VOUT'),
    '5':('VOUT','VOUT'), '6':('L2','L2'), '7':('L2','L2'), '8':('L1','L1N'),
@@ -67,19 +71,25 @@ COMPONENTS = {
    '1':('A_RED','D2_RED'), '2':('K_RED','GND'), '3':('A_GRN','D2_GRN'), '4':('K_GRN','GND')}),
  'D3': ('1N4148WS', FP['SOD'], None, {'1':('K','RTC_VDD'), '2':('A','3V3')}),
  'D4': ('1N4148WS', FP['SOD'], None, {'1':('K','RTC_VDD'), '2':('A','VBACKUP')}),
+ # D5 blocks the supercap back-draining through R27 into a dead 3V3 rail
+ # (~3mA vs the RTC's 0.25uA — found in the 2026-07-17 pre-fab audit).
+ # Charge path is now 3V3 -> R27 -> D5 -> JP1 -> VBACKUP; ceiling ~2.85V.
+ 'D5': ('1N4148WS', FP['SOD'], None, {'1':('K','CHG_JPD'), '2':('A','CHG_JP')}),
  'Y1': ('32.768kHz', 'Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm', None, {
    '1':('X1','OSCI'), '2':('X2','OSCO')}),
  # --- connectors / electromech ---
- 'J1': ('USB_C_IN', 'Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12', None, {
-   'A1':('GND','GND'),'B1':('GND','GND'),'A12':('GND','GND'),'B12':('GND','GND'),
-   'A4':('VBUS','VBUS'),'B4':('VBUS','VBUS'),'A9':('VBUS','VBUS'),'B9':('VBUS','VBUS'),
+ # merged-pad USB-C: reversible twins (A4≡B9, A9≡B4, A1≡B12, A12≡B1) share ONE pad,
+ # so VBUS/GND are single pads -> no coincident-pad DRC flags, cleaner escape.
+ 'J1': ('USB_C_IN', 'powermod:USB_C_Receptacle_TYPE-C_16P_PowerMerged', None, {
+   'A1':('GND','GND'),'A12':('GND','GND'),
+   'A4':('VBUS','VBUS'),'A9':('VBUS','VBUS'),
    'A5':('CC1','CC1_IN'),'B5':('CC2','CC2_IN'),
-   'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'S1':('SHIELD','GND')}),
- 'J2': ('USB_C_OUT', 'Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12', None, {
-   'A1':('GND','GND'),'B1':('GND','GND'),'A12':('GND','GND'),'B12':('GND','GND'),
-   'A4':('VBUS','VOUT'),'B4':('VBUS','VOUT'),'A9':('VBUS','VOUT'),'B9':('VBUS','VOUT'),
+   'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'SH':('SHIELD','GND')}),
+ 'J2': ('USB_C_OUT', 'powermod:USB_C_Receptacle_TYPE-C_16P_PowerMerged', None, {
+   'A1':('GND','GND'),'A12':('GND','GND'),
+   'A4':('VBUS','VOUT'),'A9':('VBUS','VOUT'),
    'A5':('CC1','CC1_OUT'),'B5':('CC2','CC2_OUT'),
-   'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'S1':('SHIELD','GND')}),
+   'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'SH':('SHIELD','GND')}),
  'J3': ('JST_PH_2', 'Connector_JST:JST_PH_S2B-PH-K_1x02_P2.00mm_Horizontal', None, {
    '1':('BAT+','VBAT'), '2':('BAT-','GND')}),
  'J4': ('STEMMA_QT', 'Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal', None, {
@@ -88,7 +98,7 @@ COMPONENTS = {
    '1':('UPDI','UPDI'), '2':('3V3','3V3'), '3':('GND','GND')}),
  'SW1':('BUTTON', 'Button_Switch_SMD:SW_SPST_PTS647_Sx50', None, {
    '1':('A','BUTTON'), '2':('B','GND')}),
- 'JP1':('CHG_JUMPER', FP['SJ'], None, {'1':('A','CHG_JP'), '2':('B','VBACKUP')}),
+ 'JP1':('CHG_JUMPER', FP['SJ'], None, {'1':('A','CHG_JPD'), '2':('B','VBACKUP')}),
  'JP2':('VSEL_JUMPER', FP['SJ'], None, {'1':('A','FB_MID'), '2':('B','VOUT')}),
  'L1': ('1.5uH_4.5A', 'Inductor_SMD:L_Sumida_CDMC6D28_7.25x6.5mm', None, {  # footprint per chosen part
    '1':('1','L1N'), '2':('2','L2')}),
@@ -149,7 +159,7 @@ def validate():
     G=[('Q1','1','VSYS'),('Q1','4','Q1_GATE'),('Q1','5','VBUS'),
        ('Q2','1','VSYS'),('Q2','4','VBUS'),('Q2','5','VBAT'),
        ('U4','1','GND'),('U3','13','GND'),('U3','12','CONV_EN'),
-       ('U1','3','RTC_INT'),('U2','23','UPDI'),('U2','15','SDA'),('U2','16','SCL'),
+       ('U1','3','RTC_INT'),('U2','16','UPDI'),('U2','10','SDA'),('U2','11','SCL'),
        ('J4','2','NC'),('D3','2','3V3'),('D4','2','VBACKUP'),
        ('D3','1','RTC_VDD'),('D4','1','RTC_VDD')]
     for ref,pin,net in G:
@@ -158,7 +168,7 @@ def validate():
     # INT pull-up rail
     if COMPONENTS['R19'][3]['1'][1]!='3V3': errs.append("R19 not to 3V3")
     # pin-count sanity
-    expect={'U1':8,'U2':25,'U3':15,'U4':9,'U5':3,'Q1':9,'Q2':9,'Q3':3}
+    expect={'U1':8,'U2':20,'U3':15,'U4':9,'U5':3,'Q1':9,'Q2':9,'Q3':3}
     for ref,npins in expect.items():
         if len(COMPONENTS[ref][3])!=npins: errs.append(f"{ref} pin count {len(COMPONENTS[ref][3])}!={npins}")
     return nets, errs
@@ -261,9 +271,11 @@ if __name__=='__main__':
     open(os.path.join(d,'sym-lib-table'),'w').write(
       '(sym_lib_table (version 7)\n  (lib (name "powermod")(type "KiCad")(uri "${KIPRJMOD}/powermod.kicad_sym")(options "")(descr "generated")))\n')
     libs=sorted({c[1].split(':')[0] for c in COMPONENTS.values()})
+    def _uri(l):  # 'powermod' is a local project library; the rest are KiCad stock
+        return f"${{KIPRJMOD}}/{l}.pretty" if l=='powermod' else f"${{KICAD10_FOOTPRINT_DIR}}/{l}.pretty"
     open(os.path.join(d,'fp-lib-table'),'w').write(
       '(fp_lib_table (version 7)\n'+''.join(
-        f'  (lib (name "{l}")(type "KiCad")(uri "${{KICAD10_FOOTPRINT_DIR}}/{l}.pretty")(options "")(descr ""))\n'
+        f'  (lib (name "{l}")(type "KiCad")(uri "{_uri(l)}")(options "")(descr ""))\n'
         for l in libs)+')\n')
     if not os.path.exists(os.path.join(d,'powermod.kicad_pro')):
         open(os.path.join(d,'powermod.kicad_pro'),'w').write('{"meta":{"filename":"powermod.kicad_pro","version":3}}')
