@@ -148,6 +148,26 @@ designer. Cross-checked every BOM part's package vs its board footprint:
   or use JLC's THT-assembly service (extra cost); JLC's SMT line won't place
   them.
 
+### CPL rotation (2026-07-18)
+
+`kicad-cli`'s raw CPL uses KiCad rotations, which differ from JLC's convention
+(JLC's 0° = the part's tape orientation, not the datasheet). Compared each
+oriented part's KiCad-footprint pin-1 direction vs the LCSC footprint JLC uses:
+
+- **LED D1/D2 (0°) and diodes D3/D4/D5 (0°) — already aligned.** The
+  polarity-critical parts where a flip = dead board are correct as-is (LED
+  footprint was built from the LCSC model; SOD-323 happens to match). ✓
+- **Systematic offsets on the standard KiCad library parts** (expected): SOT-23
+  (U5, Q3) ≈ 180°; SOIC/SON/DFN/ESOP (U1, U3, U4, Q1/Q2) ≈ 270°. Measured with
+  ~5° noise (184/267/263…) so **not precise enough to hand-edit** — an IC
+  rotation error kills the board.
+- **Rotation-agnostic**: R, C, inductor, button, crystal (symmetric / 2-term).
+
+**Do NOT hand-correct the CPL.** Every part has an LCSC number, so JLC's uploader
+maps each to its correct tape orientation and auto-orients most of them —
+**confirm in JLC's placement preview** (free, visual, = ground truth), paying
+attention to the ICs and SOT-23s above. LED/diodes/USB-C are pre-verified.
+
 ## Firmware contract (hardware assumes these)
 
 1. ADC reference: **use VDD (3.3V) or the 2.5V internal ref** — VBUS_DIV maxes
