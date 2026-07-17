@@ -71,17 +71,29 @@ COMPONENTS = {
  'Q3': ('BSS138', FP['SOT'], 'C52895', {         # pin order = convention, VERIFY
    '1':('G','Q1_GATE_DRV'), '2':('S','GND'), '3':('D','Q3_DRAIN')}),
  # --- diodes / LEDs / crystal ---
- 'D1': ('LED_RG_PLCC4', 'LED_SMD:LED_Avago_PLCC4_3.2x2.8mm_CW', None, {  # pad map VERIFY vs chosen part
-   '1':('A_RED','D1_RED'), '2':('K_RED','GND'), '3':('A_GRN','D1_GRN'), '4':('K_GRN','GND')}),
- 'D2': ('LED_RG_PLCC4', 'LED_SMD:LED_Avago_PLCC4_3.2x2.8mm_CW', None, {
-   '1':('A_RED','D2_RED'), '2':('K_RED','GND'), '3':('A_GRN','D2_GRN'), '4':('K_GRN','GND')}),
+ # TOGIALED TJ-S3227 dual-die LED, LCSC C601677 (~7.7k stock, yellow-green die
+ # fixes the dim-green problem). Pinout from LCSC's EasyEDA model (verified
+ # 2026-07-17): two INDEPENDENT diodes, top row anode=3 cathode=4, bottom row
+ # anode=2 cathode=1. Local footprint matches that numbering (stock KiCad Avago
+ # PLCC4 numbers the pads the OTHER way -> would reverse polarity, so NOT used).
+ # Mapping below is polarity-correct (anodes->drive nets, cathodes->GND).
+ # Red-vs-green DIE identity (top=RED assumed here) is not fixed by the EasyEDA
+ # data; it's electrically irrelevant (both dies, identical 560R) and firmware-
+ # adjustable — confirm against the datasheet colour drawing at assembly if the
+ # silk label must match. Both D1/D2 are the same part, so any swap is uniform.
+ 'D1': ('TJ-S3227', 'powermod:LED_TJ-S3227_RG_3.2x2.7mm', 'C601677', {
+   '1':('K_GRN','GND'), '2':('A_GRN','D1_GRN'), '3':('A_RED','D1_RED'), '4':('K_RED','GND')}),
+ 'D2': ('TJ-S3227', 'powermod:LED_TJ-S3227_RG_3.2x2.7mm', 'C601677', {
+   '1':('K_GRN','GND'), '2':('A_GRN','D2_GRN'), '3':('A_RED','D2_RED'), '4':('K_RED','GND')}),
  'D3': ('1N4148WS', FP['SOD'], None, {'1':('K','RTC_VDD'), '2':('A','3V3')}),
  'D4': ('1N4148WS', FP['SOD'], None, {'1':('K','RTC_VDD'), '2':('A','VBACKUP')}),
  # D5 blocks the supercap back-draining through R27 into a dead 3V3 rail
  # (~3mA vs the RTC's 0.25uA — found in the 2026-07-17 pre-fab audit).
  # Charge path is now 3V3 -> R27 -> D5 -> JP1 -> VBACKUP; ceiling ~2.85V.
  'D5': ('1N4148WS', FP['SOD'], None, {'1':('K','CHG_JPD'), '2':('A','CHG_JP')}),
- 'Y1': ('32.768kHz', 'Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm', None, {
+ # Epson Q13FC13500004: 32.768kHz, CL=12.5pF (matches BM8563 internal caps),
+ # 3215 2-pin, +-20ppm. LCSC C32346, ~286k stock (verified 2026-07-17).
+ 'Y1': ('Q13FC13500004', 'Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm', 'C32346', {
    '1':('X1','OSCI'), '2':('X2','OSCO')}),
  # --- connectors / electromech ---
  # merged-pad USB-C: reversible twins (A4≡B9, A9≡B4, A1≡B12, A12≡B1) share ONE pad,

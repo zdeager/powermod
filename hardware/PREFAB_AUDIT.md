@@ -33,12 +33,22 @@ can rerun the same checks.
 
 ## BOM obligations (no DRC can catch these)
 
-- **PLCC4 LED pinout varies by manufacturer** — pad map A_RED/K/A_GRN/K on
-  1/2/3/4 must match the ordered part.
-- **Green LED Vf**: InGaN green (Vf≈3.0V) gives 0.5mA through 560Ω = dim.
-  Order yellow-green (Vf≈2.1V) or drop R21/R23 to ~220Ω.
-- **Crystal must be CL=12.5pF** (BM8563 internal load caps assume it; a
-  6/7pF 3215 part runs fast).
+- **LEDs D1/D2 — RESOLVED 2026-07-17.** Part = TOGIALED TJ-S3227 (LCSC
+  **C601677**, ~7.7k stock), a yellow-green/red dual die (2.4V green → 1.6mA
+  through 560Ω, so no longer dim — the earlier InGaN-green concern is moot).
+  Its pinout is NOT the stock KiCad Avago PLCC4 (numbering runs the opposite
+  way → would reverse polarity), so a local footprint
+  `powermod.pretty/LED_TJ-S3227_RG_3.2x2.7mm.kicad_mod` was built from LCSC's
+  EasyEDA model (2 independent diodes: anodes = pins 2,3; cathodes = pins 1,4).
+  netlist.py + board updated (pad-diff 214/214). **Residual: red-vs-green die
+  identity (netlist assumes top row = red) is not fixed by the EasyEDA data —
+  electrically irrelevant (identical 560Ω on both) and firmware-adjustable;
+  confirm against the datasheet colour drawing only if the silk label must
+  match. Also verify LED rotation in JLCPCB's placement preview** (JLC's
+  rotation convention for 4-pin LEDs often differs from KiCad by 90/180°).
+- **Crystal — RESOLVED 2026-07-17.** Epson Q13FC13500004 (LCSC **C32346**,
+  ~286k stock): 32.768kHz, **CL=12.5pF** (matches BM8563), 3215 2-pin,
+  ±20ppm. In netlist.py.
 - **LCSC numbers VERIFIED against lcsc.com 2026-07-17** — two were wrong and
   are fixed in netlist.py:
   | Part | Number | Verdict |
