@@ -118,7 +118,12 @@ COMPONENTS = {
    '1':('A','BUTTON'), '2':('B','GND')}),
  'JP1':('CHG_JUMPER', FP['SJ'], None, {'1':('A','CHG_JPD'), '2':('B','VBACKUP')}),
  'JP2':('VSEL_JUMPER', FP['SJ'], None, {'1':('A','FB_MID'), '2':('B','VOUT')}),
- 'L1': ('1.5uH_4.5A', 'Inductor_SMD:L_Sumida_CDMC6D28_7.25x6.5mm', 'C329701', {  # footprint per chosen part
+ # C17554046 = Sumida CDMC6D28NP-1R5MC — the ONLY LCSC 1.5uH that fits this
+ # footprint exactly (pads 2.0x3.4mm @ 5.7mm; verified 2026-07-17), but OOS at
+ # LCSC. Consign it (stocked at Digi-Key/Mouser) or hand-solder (2 big pads,
+ # trivial). In-stock alts (Chilisin SCDS74 6.9mm, CENKER 6x6 4.2mm) have a
+ # different pad pitch -> would need a footprint change + switch-node re-route.
+ 'L1': ('1.5uH_4.5A', 'Inductor_SMD:L_Sumida_CDMC6D28_7.25x6.5mm', 'C17554046', {
    '1':('1','L1N'), '2':('2','L2')}),
  # --- test pads ---
  'TP1':('VBACKUP_PAD', FP['TP'], None, {'1':('P','VBACKUP')}),

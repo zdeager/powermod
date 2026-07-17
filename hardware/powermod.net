@@ -54,7 +54,7 @@
   (comp (ref "JP1") (value "CHG_JUMPER") (footprint "Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm"))
   (comp (ref "JP2") (value "VSEL_JUMPER") (footprint "Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm"))
   (comp (ref "L1") (value "1.5uH_4.5A") (footprint "Inductor_SMD:L_Sumida_CDMC6D28_7.25x6.5mm")
-   (fields (field (name "LCSC") "C329701")))
+   (fields (field (name "LCSC") "C17554046")))
   (comp (ref "Q1") (value "AON7407") (footprint "Package_DFN_QFN:DFN-8-1EP_3x3mm_P0.65mm_EP1.6x2.56mm")
    (fields (field (name "LCSC") "C176756")))
   (comp (ref "Q2") (value "AON7407") (footprint "Package_DFN_QFN:DFN-8-1EP_3x3mm_P0.65mm_EP1.6x2.56mm")

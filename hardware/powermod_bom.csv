@@ -13,7 +13,7 @@
 "UPDI_HDR","J5","PinHeader_1x03_P2.54mm_Vertical",""
 "CHG_JUMPER","JP1","SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm",""
 "VSEL_JUMPER","JP2","SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm",""
-"1.5uH_4.5A","L1","L_Sumida_CDMC6D28_7.25x6.5mm","C329701"
+"1.5uH_4.5A","L1","L_Sumida_CDMC6D28_7.25x6.5mm","C17554046"
 "AON7407","Q1,Q2","DFN-8-1EP_3x3mm_P0.65mm_EP1.6x2.56mm","C176756"
 "BSS138","Q3","SOT-23","C52895"
 "1.2k","R1","R_0402_1005Metric","C25862"

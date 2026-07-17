@@ -118,6 +118,32 @@ exact RDSon.
   | BM8563 | ~~C194063~~ → **C269877** | old # was the TSSOP-8 (doesn't fit our SOIC-8 footprint) and OOS. C269877 = BM8563ESA SOP-8, 80k stock |
   Stock numbers are point-in-time — recheck at order.
 
+## BOM footprint audit (2026-07-17)
+
+JLC verifies a part *exists and is in stock*, and does a light sanity review —
+it does NOT verify the part's package matches your PCB footprint. That's on the
+designer. Cross-checked every BOM part's package vs its board footprint:
+
+- **Passives (all R 0402, C 0402/0603/0805)** — standard EIA chip packages,
+  fit by definition. Safe.
+- **Standard IC/discrete packages** (SOIC-8/20W, VSON-14, ESOP-8, SOT-23,
+  DFN-8, SOD-323, 3215 crystal) — package names match the footprints. Safe.
+- **USB-C (C165948, verified)** — the custom merged footprint (12 signal + 4
+  shield) matches the real connector: C165948's footprint is 12 signal + 4
+  shield = 16 pads, i.e. the reversible twins are commoned exactly as our merge
+  assumes. Our footprint also carries the 2 mounting-peg holes. ✓
+- **JST-SH J4 (C51940130, verified)** — 6 pads, 1mm pitch, matches. ✓
+- **Inductor L1** — only the Sumida CDMC6D28-1R5MC (C17554046) fits the
+  footprint (pads 2.0×3.4mm @ 5.7mm); it's **OOS at LCSC** → consign (stocked
+  at Digi-Key/Mouser) or hand-solder (2 pads). In-stock alts (Chilisin SCDS74
+  6.9mm pitch, CENKER 6×6 4.2mm) need a footprint change + switch-node reroute.
+- **Button SW1 (C2799716)** — pad-span reads ~0.9mm longer than the footprint;
+  likely a rotation/measurement artifact but **verify against the C&K PTS647
+  datasheet** before ordering.
+- **Through-hole parts: J3 (JST-PH battery) and J5 (UPDI header)** — hand-solder
+  or use JLC's THT-assembly service (extra cost); JLC's SMT line won't place
+  them.
+
 ## Firmware contract (hardware assumes these)
 
 1. ADC reference: **use VDD (3.3V) or the 2.5V internal ref** — VBUS_DIV maxes
