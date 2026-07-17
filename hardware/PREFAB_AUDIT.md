@@ -137,9 +137,13 @@ designer. Cross-checked every BOM part's package vs its board footprint:
   footprint (pads 2.0×3.4mm @ 5.7mm); it's **OOS at LCSC** → consign (stocked
   at Digi-Key/Mouser) or hand-solder (2 pads). In-stock alts (Chilisin SCDS74
   6.9mm pitch, CENKER 6×6 4.2mm) need a footprint change + switch-node reroute.
-- **Button SW1 (C2799716)** — pad-span reads ~0.9mm longer than the footprint;
-  likely a rotation/measurement artifact but **verify against the C&K PTS647
-  datasheet** before ordering.
+- **Button SW1 (C2799716) — VERIFIED against the C&K PTS647 datasheet.** The
+  board footprint (pads 1.55×1.0mm at ±2.625×±1.6) matches the datasheet's
+  Recommended PCB Layout exactly (6.8mm land / 3.7mm inner gap × 4.2 / 2.2mm).
+  Variant also correct: C2799716 = PTS647SK50 (2.5N, 5.0mm) = the Sx50
+  footprint. The earlier ~0.9mm flag was LCSC's own oversized reference
+  footprint — irrelevant to assembly (JLC places the part on our datasheet-
+  correct pads). No change needed.
 - **Through-hole parts: J3 (JST-PH battery) and J5 (UPDI header)** — hand-solder
   or use JLC's THT-assembly service (extra cost); JLC's SMT line won't place
   them.
