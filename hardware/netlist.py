@@ -85,12 +85,12 @@ COMPONENTS = {
    '1':('K_GRN','GND'), '2':('A_GRN','D1_GRN'), '3':('A_RED','D1_RED'), '4':('K_RED','GND')}),
  'D2': ('TJ-S3227', 'powermod:LED_TJ-S3227_RG_3.2x2.7mm', 'C601677', {
    '1':('K_GRN','GND'), '2':('A_GRN','D2_GRN'), '3':('A_RED','D2_RED'), '4':('K_RED','GND')}),
- 'D3': ('1N4148WS', FP['SOD'], None, {'1':('K','RTC_VDD'), '2':('A','3V3')}),
- 'D4': ('1N4148WS', FP['SOD'], None, {'1':('K','RTC_VDD'), '2':('A','VBACKUP')}),
+ 'D3': ('1N4148WS', FP['SOD'], 'C51898295', {'1':('K','RTC_VDD'), '2':('A','3V3')}),
+ 'D4': ('1N4148WS', FP['SOD'], 'C51898295', {'1':('K','RTC_VDD'), '2':('A','VBACKUP')}),
  # D5 blocks the supercap back-draining through R27 into a dead 3V3 rail
  # (~3mA vs the RTC's 0.25uA — found in the 2026-07-17 pre-fab audit).
  # Charge path is now 3V3 -> R27 -> D5 -> JP1 -> VBACKUP; ceiling ~2.85V.
- 'D5': ('1N4148WS', FP['SOD'], None, {'1':('K','CHG_JPD'), '2':('A','CHG_JP')}),
+ 'D5': ('1N4148WS', FP['SOD'], 'C51898295', {'1':('K','CHG_JPD'), '2':('A','CHG_JP')}),
  # Epson Q13FC13500004: 32.768kHz, CL=12.5pF (matches BM8563 internal caps),
  # 3215 2-pin, +-20ppm. LCSC C32346, ~286k stock (verified 2026-07-17).
  'Y1': ('Q13FC13500004', 'Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm', 'C32346', {
@@ -98,27 +98,27 @@ COMPONENTS = {
  # --- connectors / electromech ---
  # merged-pad USB-C: reversible twins (A4≡B9, A9≡B4, A1≡B12, A12≡B1) share ONE pad,
  # so VBUS/GND are single pads -> no coincident-pad DRC flags, cleaner escape.
- 'J1': ('USB_C_IN', 'powermod:USB_C_Receptacle_TYPE-C_16P_PowerMerged', None, {
+ 'J1': ('USB_C_IN', 'powermod:USB_C_Receptacle_TYPE-C_16P_PowerMerged', 'C165948', {
    'A1':('GND','GND'),'A12':('GND','GND'),
    'A4':('VBUS','VBUS'),'A9':('VBUS','VBUS'),
    'A5':('CC1','CC1_IN'),'B5':('CC2','CC2_IN'),
    'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'SH':('SHIELD','GND')}),
- 'J2': ('USB_C_OUT', 'powermod:USB_C_Receptacle_TYPE-C_16P_PowerMerged', None, {
+ 'J2': ('USB_C_OUT', 'powermod:USB_C_Receptacle_TYPE-C_16P_PowerMerged', 'C165948', {
    'A1':('GND','GND'),'A12':('GND','GND'),
    'A4':('VBUS','VOUT'),'A9':('VBUS','VOUT'),
    'A5':('CC1','CC1_OUT'),'B5':('CC2','CC2_OUT'),
    'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'SH':('SHIELD','GND')}),
- 'J3': ('JST_PH_2', 'Connector_JST:JST_PH_S2B-PH-K_1x02_P2.00mm_Horizontal', None, {
+ 'J3': ('JST_PH_2', 'Connector_JST:JST_PH_S2B-PH-K_1x02_P2.00mm_Horizontal', 'C173752', {
    '1':('BAT+','VBAT'), '2':('BAT-','GND')}),
- 'J4': ('STEMMA_QT', 'Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal', None, {
+ 'J4': ('STEMMA_QT', 'Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal', 'C51940130', {
    '1':('GND','GND'), '2':('VCC_NC','NC'), '3':('SDA','SDA'), '4':('SCL','SCL')}),
  'J5': ('UPDI_HDR', 'Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical', None, {
    '1':('UPDI','UPDI'), '2':('3V3','3V3'), '3':('GND','GND')}),
- 'SW1':('BUTTON', 'Button_Switch_SMD:SW_SPST_PTS647_Sx50', None, {
+ 'SW1':('BUTTON', 'Button_Switch_SMD:SW_SPST_PTS647_Sx50', 'C2799716', {
    '1':('A','BUTTON'), '2':('B','GND')}),
  'JP1':('CHG_JUMPER', FP['SJ'], None, {'1':('A','CHG_JPD'), '2':('B','VBACKUP')}),
  'JP2':('VSEL_JUMPER', FP['SJ'], None, {'1':('A','FB_MID'), '2':('B','VOUT')}),
- 'L1': ('1.5uH_4.5A', 'Inductor_SMD:L_Sumida_CDMC6D28_7.25x6.5mm', None, {  # footprint per chosen part
+ 'L1': ('1.5uH_4.5A', 'Inductor_SMD:L_Sumida_CDMC6D28_7.25x6.5mm', 'C329701', {  # footprint per chosen part
    '1':('1','L1N'), '2':('2','L2')}),
  # --- test pads ---
  'TP1':('VBACKUP_PAD', FP['TP'], None, {'1':('P','VBACKUP')}),
@@ -128,8 +128,17 @@ COMPONENTS = {
  'TP5':('VBACKUP_GND_PAD', FP['TP'], None, {'1':('P','GND')}),
  'TP6':('VOUT_GND_PAD',    FP['TP'], None, {'1':('P','GND')}),
 }
-def R(val,a,b,fp='R04'): return (val, FP[fp], None, {'1':('1',a),'2':('2',b)})
-def C(val,a,b,fp='C04'): return (val, FP[fp], None, {'1':('1',a),'2':('2',b)})
+# JLC part numbers for the jellybean passives (verified on lcsc.com 2026-07-17).
+# Resistors: UNI-ROYAL 0402WGF series (JLC Basic). Caps: Samsung CL-series
+# (Basic) except 1u=C5673 (Extended, 25V, well-stocked; the Basic 50V had 50 in stock).
+PASSIVE_LCSC = {
+  '560':'C25126','1k':'C11702','1.2k':'C25862','5.1k':'C25905','10k':'C25744',
+  '47k':'C25792','56k':'C25796','100k':'C25741','180k':'C25760','330k':'C25778',
+  '620k':'C270590','1M':'C26083',
+  '100n':'C1525','10u':'C15850','22u':'C45783','1u':'C5673','4.7u':'C19666',
+}
+def R(val,a,b,fp='R04'): return (val, FP[fp], PASSIVE_LCSC.get(val), {'1':('1',a),'2':('2',b)})
+def C(val,a,b,fp='C04'): return (val, FP[fp], PASSIVE_LCSC.get(val), {'1':('1',a),'2':('2',b)})
 COMPONENTS.update({
  'R1': R('1.2k','PROG','GND'),          # TP4056 1A
  'R2': R('5.1k','CC1_IN','GND'),  'R3': R('5.1k','CC2_IN','GND'),
@@ -193,6 +202,28 @@ def validate():
 
 # ---------------------------------------------------------------- generators
 def u(): return str(uuid.uuid4())
+
+
+def gen_bom(path):
+    """JLCPCB assembly BOM (Comment, Designator, Footprint, LCSC Part #).
+    Parts with no LCSC (test points, solder jumpers, J5 header) are emitted with
+    a blank LCSC = 'do not place / hand-solder' at upload time."""
+    from collections import defaultdict
+    groups=defaultdict(list)  # (value, footprint, lcsc) -> [refs]
+    for ref,(val,fp,lcsc,pins) in COMPONENTS.items():
+        groups[(val,fp,lcsc or '')].append(ref)
+    def keyf(r): return (r[0][0], int(''.join(c for c in r[0] if c.isdigit()) or 0))
+    rows=[]
+    for (val,fp,lcsc),refs in groups.items():
+        des=','.join(sorted(refs,key=lambda r:(r[0],int(''.join(c for c in r if c.isdigit()) or 0))))
+        rows.append((des,val,fp.split(':')[-1],lcsc))
+    rows.sort(key=lambda x:x[0])
+    out=['"Comment","Designator","Footprint","LCSC Part #"']
+    for des,val,fp,lcsc in rows:
+        out.append(f'"{val}","{des}","{fp}","{lcsc}"')
+    open(path,'w').write('\n'.join(out)+'\n')
+    placed=sum(1 for r in rows if r[3]); nolcsc=[r[0] for r in rows if not r[3]]
+    return len(rows), placed, nolcsc
 
 def gen_net(path):
     nets,_=validate()
@@ -283,6 +314,9 @@ if __name__=='__main__':
     if errs:
         print("VALIDATION FAILED:"); [print(" ",e) for e in errs]; sys.exit(1)
     ncount=gen_net(os.path.join(os.path.dirname(__file__) or '.','powermod.net'))
+    d0=os.path.dirname(__file__) or '.'
+    nlines,placed,nolcsc=gen_bom(os.path.join(d0,'powermod_bom.csv'))
+    print(f'BOM: {nlines} lines, {placed} with LCSC; blank (hand-solder/DNP): {nolcsc}')
     d=os.path.dirname(__file__) or '.'
     gen_sch(os.path.join(d,'powermod.kicad_sch'))
     gen_symlib(os.path.join(d,'powermod.kicad_sym'))
