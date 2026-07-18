@@ -10,7 +10,7 @@
 "USB_C_OUT","J2","USB_C_Receptacle_TYPE-C_16P_PowerMerged","C165948"
 "JST_PH_2","J3","JST_PH_S2B-PH-K_1x02_P2.00mm_Horizontal",""
 "STEMMA_QT","J4","JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal","C51940130"
-"SWD_HDR","J5","PinHeader_1x03_P2.54mm_Vertical",""
+"SWD_HDR","J5","PinHeader_1x04_P2.54mm_Vertical",""
 "1.5uH","L1","L_Sumida_CDMC6D28_7.25x6.5mm","C5189751"
 "AON7407","Q1,Q2","DFN-8-1EP_3x3mm_P0.65mm_EP1.6x2.56mm","C176756"
 "BSS138","Q3","SOT-23","C52895"
