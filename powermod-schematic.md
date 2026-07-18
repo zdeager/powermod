@@ -6,6 +6,8 @@ Sources: `powermod-spec.md` §Pre-BOM electrical walk (net map), `powermod-bom.m
 
 **Machine transcription: `hardware/netlist.py`** — the same connectivity as a Python data structure, with a validator (golden board-killer facts, pin counts, no singleton nets) and generators for `hardware/powermod.net` (import into pcbnew for layout) and `hardware/powermod.kicad_sch` (global-label-style schematic). **Verified with KiCad 10.0.4 (2026-07-15): ERC = 0 violations, and the netlist KiCad derives from the schematic's labels is connectivity-identical to `powermod.net` — 44 nets, same membership, proven by round-trip diff.** All footprint names verified to exist in the installed KiCad libraries (the TPS63020's VSON-14 footprint traced to a TI drawing; the LEDs moved to 4-pad PLCC4, the standard top-mount bicolor package). The §0 pin-order flags for XC6206/BSS138/J4/LED still stand — a footprint existing is not the same as the die being wired to it the way convention says.
 
+> **⚠ MCU MIGRATION (instock-parts branch, 2026-07-18): ATtiny1617/1616 → PY32F003F18P6.** No well-stocked AVR exists at JLC in *any* package, so the MCU is now the **PY32F003F18P6** (ARM Cortex-M0+, TSSOP-20, LCSC C5379864). **The authoritative pin map is `hardware/netlist.py`, reproduced in the PY32 table at the top of §1.** This document's original **ATtiny1617 VQFN-24** tables, the pin *numbers* referenced throughout §2, the UPDI notes, and the 1.5V-reference note are **RETAINED VERBATIM AS THE ROLLBACK REFERENCE** — they are correct for the AVR and unmodified. What changed: only the MCU part + its pin numbers, UPDI→SWD programming, and **two firmware items** (ADC VREFINT calibration; I²C host-cutoff at VDD≥3.0V — see `powermod-spec.md` §Interface). **Net connectivity in §2 is unchanged** (same 45 nets; UPDI→NRST is the only swap), so every *net* mapping below still holds — read the §2 pin numbers as the ATtiny's, and the PY32 equivalent from §1/netlist.py.
+
 ## 0. Pinout provenance
 
 | Part | Pinout basis |
@@ -18,7 +20,40 @@ Sources: `powermod-spec.md` §Pre-BOM electrical walk (net map), `powermod-bom.m
 | XC6206 (SOT-23) | ⚠ convention (1 VSS, 2 VOUT, 3 VIN) — **confirm against the LCSC footprint at capture** |
 | BSS138 (SOT-23) | ⚠ convention (1 G, 2 S, 3 D) — **confirm against the LCSC footprint at capture** |
 
-## 1. MCU pin assignment — 18 used + 4 spare, exactly the budget
+## 1. MCU pin assignment
+
+### 1a. PY32F003F18P6 (TSSOP-20) — CURRENT board (instock-parts branch)
+
+Authoritative map = `hardware/netlist.py`. 17 signals + NRST + VCC/GND = all 20 pins (0 spare, like the 1616). Verified vs the LCSC C5379864 symbol.
+
+| TSSOP-20 | Port | Signal | Mode / note |
+|---|---|---|---|
+| 1 | PA2 | `Q1_GATE_DRV` | output (+100k↓) — drives Q3 gate |
+| 2 | PA3 | `CONV_EN` | output (+100k↓) — TPS63020 EN |
+| 3 | PA4 | `VBAT_SENSE` (`VBAT_DIV`) | ADC_IN4 — 1M/330k + 100nF; **VREFINT calibration required** (see ADC note §1c) |
+| 4 | PA5 | `VBUS_SENSE` (`VBUS_DIV`) | ADC_IN5 — same divider + requirement |
+| 5 | PA6 | `CHG_CE` | output — TP4056 CE (100k↑VBUS = charge-by-default) |
+| 6 | PA7 | `CHG_STDBY` | input, 10k↑3V3 — TP4056 STDBY |
+| 7 | VSS | GND | |
+| 8 | PA12 | `RTC_INT` | input (EXTI12), 10k↑3V3 |
+| 9 | VCC | 3V3 | |
+| 10 | PA13 | `LED_BAT_A` | output 560Ω — **shared with SWDIO** |
+| 11 | PA14 | `LED_BAT_B` | output 560Ω — **shared with SWCLK** |
+| 12 | PB5 | `CHG_CHRG` | input, 10k↑3V3 — TP4056 CHRG |
+| 13 | PB6 | `SCL` (host bus) | **I²C1 SCL — hardware I²C slave** |
+| 14 | PB7 | `SDA` (host bus) | **I²C1 SDA — hardware I²C slave** |
+| 15 | PF4 | `LED_PWR_B` | output 560Ω — BOOT0 (output only; Hi-Z at reset → boots flash) |
+| 16 | PF0 | `RTC_SDA` | bit-banged, open-drain — internal RTC bus |
+| 17 | PF1 | `RTC_SCL` | bit-banged, open-drain — internal RTC bus |
+| 18 | PF2 | `NRST` | reset — brought to J5.4 for connect-under-reset |
+| 19 | PA0 | `LED_PWR_A` | output 560Ω |
+| 20 | PA1 | `BUTTON` | input, internal pull-up |
+
+**Programming: SWD** (SWDIO=PA13, SWCLK=PA14, NRST=PF2) on the 4-pin J5 header (GND/SWCLK/SWDIO/NRST). The 2 BAT LEDs share SWDIO/SWCLK, so a debugger must **connect-under-reset** (NRST=J5.4); UART bootloader (BOOT0=PF4) is the fallback.
+
+**§1c. ADC reference (PY32).** Unlike the ATtiny's fixed internal reference, the PY32 references **VDDA (the 3.3V LDO rail)**, which sags at battery-empty. **Firmware MUST sample VREFINT (1.2V bandgap) each conversion to compute true VDDA and rescale** `VBAT_DIV`/`VBUS_DIV` — this recovers the ATtiny's fixed-reference accuracy. Divider unchanged.
+
+### 1b. ATtiny1617 (VQFN-24) — ROLLBACK REFERENCE (retained; correct for the AVR) — "18 used + 4 spare, exactly the budget"
 
 | VQFN-24 | Port | Signal | Direction / mode | Why this pin |
 |---|---|---|---|---|

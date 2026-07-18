@@ -4,6 +4,12 @@ Last updated: 2026-07-15
 Status: **Draft, walked line-by-line 2026-07-15 (three findings: missing VBUS bulk, missing `INT` pull-up, and the `CE` timing claim falsified by this BOM's own values). Prices verified on LCSC 2026-07-15 at the stated tier unless marked ~estimated.**
 Sources of truth: `powermod-spec.md` §Pre-BOM electrical walk (the net map this BOM implements) and §Appendix (claims register — every part capability cited there). This document adds nothing to the design; it is the transcription the spec was written to make boring.
 
+> **⚠ MCU + 2 PARTS MIGRATED (instock-parts branch, 2026-07-18) — all now in JLC stock.** No well-stocked AVR exists at JLC in *any* package, so three parts changed. **The rows below show the CURRENT parts; the superseded parts are kept inline (and here) as the rollback reference. The authoritative BOM is `hardware/powermod_bom.csv` (generated from `netlist.py`).**
+> - **U2 MCU: ATTINY1617-MNR (VQFN-24, C614176) → PY32F003F18P6** (ARM M0+, TSSOP-20, C5379864, ~22k stock). Two firmware items follow (ADC VREFINT calibration; I²C host-cutoff at VDD≥3.0V — see `powermod-spec.md` §Interface). PY32 pin map: `powermod-schematic.md` §1a.
+> - **L1 inductor: Sumida CDMC6D28 (1.5µH, Isat 4.5A, OOS) → CYA0650-1.5UH** (C5189751, ~11k stock; **same 5.7mm land — no layout change**, Isat ~10A / 7mΩ). Strictly better; SPICE unaffected (same 1.5µH).
+> - **SW1 button: C&K PTS647SK50 (OOS) → PTS647SN50** (C2799414, ~9k stock; identical PTS647 4.5×4.5 land).
+> - **DNP/hand-solder: J3 (battery JST) and J5 (now a 4-pin SWD header, was a 3-pin UPDI header).**
+
 ---
 
 ## 1. Semiconductors — all datasheet-verified, all priced
@@ -11,7 +17,7 @@ Sources of truth: `powermod-spec.md` §Pre-BOM electrical walk (the net map this
 | Ref | Part | Package | LCSC | Qty | Unit @100–150 | Role |
 |---|---|---|---|---|---|---|
 | U1 | **BM8563** (Shanghai Belling) | TSSOP/SOP-8 | [C194063](https://www.lcsc.com/product-detail/Others_Shanghai-Belling-BM8563_C194063.html) | 1 | **$0.056** | RTC, PCF8563-class. **Reversed from RV-3028 (−$1.67)**. Belling's own datasheet gate-verified (claims row 44, closed); GATEMODE C269877 ($0.108) is the equally-verified alternate |
-| U2 | **ATTINY1617-MNR** (Microchip) | VQFN-24 4×4 | [C614176](https://www.lcsc.com/product-detail/C614176.html) | 1 | **$0.93** ⚠ see sourcing | MCU. 18 of 22 I/O used, 4 spare |
+| U2 | **PY32F003F18P6** (Puya) — *was ATTINY1617-MNR (C614176), see migration banner* | TSSOP-20 | [C5379864](https://www.lcsc.com/product-detail/C5379864.html) | 1 | **~$0.31** | MCU (ARM Cortex-M0+, 64K/8K). 17 signals + NRST, 0 spare. Pin map: schematic §1a; +2 firmware items |
 | U3 | **TPS63020DSJR** (TI) — adjustable, **not** 63021 | VSON-14 | [C15483](https://www.lcsc.com/product-detail/C15483.html) | 1 | **$0.54** | Buck-boost, 5V/3.3V out, load disconnect = host switch |
 | U4 | **TP4056** (TPOWER) | ESOP-8 | [C382139](https://www.lcsc.com/product-detail/Battery-Management-ICs_TPOWER-TP4056_C382139.html) | 1 | **$0.084** | 1A LiPo charger, behind the OR |
 | U5 | **XC6206P332MR-G** (Torex) | SOT-23 | [C5446](https://lcsc.com/product-detail/Dropout-Regulators-LDO_Torex-Semicon-XC6206P332MR_C5446.html) | 1 | **$0.096** | 3.3V logic rail. Iq 1µA |
@@ -33,7 +39,7 @@ Sources of truth: `powermod-spec.md` §Pre-BOM electrical walk (the net map this
 
 | Ref | Value | Spec | Qty | Unit ~est | Note |
 |---|---|---|---|---|---|
-| L1 | **1.5µH** | **Isat ≥ 4.5A**, low-DCR power inductor | 1 | ~$0.15 | TPS63020 reference design. **Isat is the spec that matters** — the switch limit is 4A typ/4.5A max |
+| L1 | **1.5µH** — CYA0650-1.5UH ([C5189751](https://www.lcsc.com/product-detail/C5189751.html)) | **Isat ~10A**, 7mΩ DCR | 1 | ~$0.26 | TPS63020 ref design. **Isat is the spec that matters** — switch limit 4A typ/4.5A max. *Was Sumida CDMC6D28 (Isat 4.5A, OOS); same 5.7mm land* |
 | C-in | 10µF X5R ≥10V | 0805 | 2 | ~$0.02 | TPS63020 input, per datasheet |
 | C-out | 22µF X5R ≥10V | 0805/1206 | 3 | ~$0.05 | TPS63020 output, per datasheet |
 | C-bat | 4.7µF | 0603 | 1 | ~$0.01 | TP4056 `BAT` — **required for no-battery stability and the `CE` test** (with the 1.33MΩ divider it sets the test's τ≈6.2s — hence the 500ms decay-delta method) |
@@ -73,9 +79,9 @@ Sources of truth: `powermod-spec.md` §Pre-BOM electrical walk (the net map this
 | J1, J2 | USB-C receptacle, 16-pin, 5V-only class | 2 | ~$0.08 | Input and output — identical on purpose; silkscreen differentiates |
 | J3 | JST **PH** 2-pin, top or side entry | 1 | ~$0.04 | Battery. **2A rating is the connector's, not the board's** |
 | J4 | JST **SH** 4-pin (STEMMA-QT/Qwiic) | 1 | ~$0.06 | I2C. **Pin 4 (VCC position) is NC — deliberate** |
-| SW1 | Tactile switch, SMD | 1 | ~$0.02 | The button |
+| SW1 | Tactile switch, SMD — **C&K PTS647SN50** ([C2799414](https://www.lcsc.com/product-detail/C2799414.html)) | 1 | ~$0.34 | The button. *Was PTS647SK50 (OOS); identical PTS647 land* |
 | D1, D2 | **Bicolor LED, red/green only** | 2 | ~$0.04 | **Blue/white (Vf≈3V) have no headroom on a 3.3V rail** — this is a requirement, not a preference |
-| — | UPDI: 3 pads or 1×3 header | 1 | ~$0.02 | Field firmware updates |
+| J5 | **SWD: 1×4 header** (GND/SWCLK/SWDIO/NRST), DNP hand-solder | 1 | ~$0.02 | Field firmware updates — SWD for the PY32 (**was UPDI 1×3** for the ATtiny) |
 | — | **Paired** solder pads — BAT+GND, VOUT+GND, VBACKUP+GND (each interface with its ground adjacent); JP1 (backup charge) + JP2 (5V/3.3V) solder jumpers — **both ship open** | — | $0 | Copper |
 
 **Connector subtotal: ≈ $0.38**
@@ -95,7 +101,7 @@ PCB and assembly excluded. For scale: after the RTC reversal the costliest chip 
 
 ## 6. Sourcing risks — the two ⚠ flags
 
-- **U2 ATTINY1617-MNR: only 62 units in LCSC stock at the verified price.** The -MN variant is stocked deeper at $1.63 (+$0.70). Fallback is *not* the ATtiny1616 — it no longer fits (18 signals vs 17 free with `INT` fitted). Check stock at order time; the family is mainstream Microchip and this is a timing risk, not an availability risk.
+- **U2: SUPERSEDED → PY32F003F18P6 (~22k JLC stock).** The AVR sourcing risk recorded here is exactly why the MCU moved (migration banner): the *whole* tinyAVR/megaAVR-0 line is <~100 assembly units at JLC in every package — an availability wall, not a timing risk. **Original AVR note kept for rollback:** ~~U2 ATTINY1617-MNR: only 62 units in LCSC stock at the verified price. The -MN variant is stocked deeper at $1.63 (+$0.70). Fallback is *not* the ATtiny1616 — it no longer fits (18 signals vs 17 free with `INT` fitted). Check stock at order time; the family is mainstream Microchip and this is a timing risk, not an availability risk.~~
 - **U1 BM8563: both vendors now gate-verified from their own datasheets** (claims row 44, closed 2026-07-15 — Belling's PDF surfaced via M5Stack's mirror of belling.com.cn, and its electrical tables are byte-identical to GATEMODE's). **Primary: Belling C194063 ($0.056)**, with M5Stack's shipped volume as field evidence; **alternate: GATEMODE C269877 ($0.108)**. Commodity PCF8563-class silicon, NXP as the architecture reference — the former sole-source risk is fully retired.
 
 ## 7. Open at the bench — unchanged, and this BOM adds nothing to the list
