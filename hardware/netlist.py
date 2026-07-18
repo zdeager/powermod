@@ -32,24 +32,33 @@ COMPONENTS = {
  'U1': ('BM8563ESA', 'Package_SO:SOIC-8_3.9x4.9mm_P1.27mm', 'C269877', {
    '1':('OSCI','OSCI'), '2':('OSCO','OSCO'), '3':('INT','RTC_INT'), '4':('VSS','GND'),
    '5':('SDA','RTC_SDA'), '6':('SCL','RTC_SCL'), '7':('CLKOUT','NC'), '8':('VDD','RTC_VDD')}),
- # ATtiny1616 SOIC-20 (was ATtiny1617 QFN-24): 1.27mm pitch, no exposed pad,
- # hand-solderable, far easier to route. Pinout = KiCad ATtiny406-S base (verified
- # against the symbol lib). 4 signals reassigned off pins the 20-pin part lacks
- # (PB6/PB7/PC4/PC5 -> PA6/PA7/PC0/PC1); zero spare pins now. LCSC to confirm.
- # LCSC verified 2026-07-17: C2891852 was WRONG (a 4-pin 1.2mm header, not an MCU).
- # C614136 = ATTINY1616-SN (SOIC-20, 20MHz, 1.8-5.5V) — correct part, 0 stock at
- # LCSC at check time; in-stock sub = C145558 ATTINY1616-SFR (16MHz, 2.7V MIN
- # supply — thin margin at battery-empty, prefer the -SN from Mouser/DigiKey).
- 'U2': ('ATtiny1616', 'Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm', 'C614136', {
-   '1':('VCC','3V3'), '2':('PA4/VBAT_SENSE','VBAT_DIV'), '3':('PA5/VBUS_SENSE','VBUS_DIV'),
-   '4':('PA6/LED_BAT_A','LED_BAT_A'), '5':('PA7/LED_BAT_B','LED_BAT_B'),
-   '6':('PB5/CHG_STDBY','CHG_STDBY'), '7':('PB4/CHG_CHRG','CHG_CHRG'),
-   '8':('PB3/LED_PWR_B','LED_PWR_B'), '9':('PB2/LED_PWR_A','LED_PWR_A'),
-   '10':('PB1/SDA','SDA'), '11':('PB0/SCL','SCL'),
-   '12':('PC0/CHG_CE','CHG_CE'), '13':('PC1/RTC_SCL','RTC_SCL'),
-   '14':('PC2/RTC_INT','RTC_INT'), '15':('PC3/Q1_GATE_DRV','Q1_GATE_DRV'),
-   '16':('PA0/UPDI','UPDI'), '17':('PA1/RTC_SDA','RTC_SDA'),
-   '18':('PA2/BUTTON','BUTTON'), '19':('PA3/CONV_EN','CONV_EN'), '20':('GND','GND')}),
+ # PY32F003F18P6TU (Puya, ARM Cortex-M0+ 48MHz, TSSOP-20, LCSC C5379864, ~22k
+ # stock, Extended). Replaces the ATtiny1616: NO well-stocked AVR exists at JLC
+ # in any package — the whole tinyAVR 1-series AND megaAVR-0 line are <~100 units
+ # each, all Extended (checked 2026-07-18). Pinout transcribed from the LCSC/
+ # EasyEDA symbol (C5379864) verified 2026-07-18. Constraints honoured:
+ #   ADC  -> PA4/PA5 (ADC_IN4/5)          HW I2C1 -> PB6/PB7 (STEMMA bus)
+ #   RTC I2C bit-banged -> PF0/PF1        SWD -> PA13/PA14, shared with the 2 BAT
+ #   LEDs (LEDs tolerate SWD idle; debugger connects under reset via NRST=PF2 on
+ #   the header). BOOT0=PF4 carries an LED OUTPUT only (Hi-Z at reset -> internal
+ #   pull-down -> boots flash; never put an input on BOOT0). 0 spare pins.
+ # ADC ref = VDD (3.3V, the XC6206 rail). Existing 1M/330k dividers peak at
+ # VBUS 5.25V->1.30V, VBAT 4.25V->1.05V: no clip, ~1.6k/1.3k of 4096 counts
+ # (finer than the ATtiny's 10-bit) -> dividers UNCHANGED (also keeps the BOM to
+ # common in-stock values). Ref accuracy = LDO ±2%; firmware can trim vs the
+ # internal bandgap if needed. Net names are IDENTICAL to the ATtiny mapping
+ # (only pin assignment moved) except UPDI dropped / NRST added.
+ 'U2': ('PY32F003F18P6', 'Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm', 'C5379864', {
+   '1':('PA2/Q1_GATE_DRV','Q1_GATE_DRV'), '2':('PA3/CONV_EN','CONV_EN'),
+   '3':('PA4/VBAT_SENSE','VBAT_DIV'),     '4':('PA5/VBUS_SENSE','VBUS_DIV'),
+   '5':('PA6/CHG_CE','CHG_CE'),           '6':('PA7/CHG_STDBY','CHG_STDBY'),
+   '7':('VSS','GND'),                     '8':('PA12/RTC_INT','RTC_INT'),
+   '9':('VDD','3V3'),                     '10':('PA13/SWDIO/LED_BAT_A','LED_BAT_A'),
+   '11':('PA14/SWCLK/LED_BAT_B','LED_BAT_B'), '12':('PB5/CHG_CHRG','CHG_CHRG'),
+   '13':('PB6/I2C_SCL','SCL'),            '14':('PB7/I2C_SDA','SDA'),
+   '15':('PF4/BOOT0/LED_PWR_B','LED_PWR_B'), '16':('PF0/RTC_SDA','RTC_SDA'),
+   '17':('PF1/RTC_SCL','RTC_SCL'),        '18':('PF2/NRST','NRST'),
+   '19':('PA0/LED_PWR_A','LED_PWR_A'),    '20':('PA1/BUTTON','BUTTON')}),
  'U3': ('TPS63020DSJR', 'Package_SON:VSON-14-1EP_3x4.45mm_P0.65mm_EP1.6x4.2mm', 'C15483', {
    '1':('VINA','VSYS'), '2':('GND','GND'), '3':('FB','FB'), '4':('VOUT','VOUT'),
    '5':('VOUT','VOUT'), '6':('L2','L2'), '7':('L2','L2'), '8':('L1','L1N'),
@@ -112,8 +121,13 @@ COMPONENTS = {
    '1':('BAT+','VBAT'), '2':('BAT-','GND')}),
  'J4': ('STEMMA_QT', 'Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal', 'C51940130', {
    '1':('GND','GND'), '2':('VCC_NC','NC'), '3':('SDA','SDA'), '4':('SCL','SCL')}),
- 'J5': ('UPDI_HDR', 'Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical', None, {
-   '1':('UPDI','UPDI'), '2':('3V3','3V3'), '3':('GND','GND')}),
+ # SWD programming header (was 3-pin UPDI). PY32 = 2-wire SWD; because the two BAT
+ # LEDs share SWDIO/SWCLK, a debugger MUST connect-under-reset, so NRST is brought
+ # out. 1x05: GND, SWCLK, SWDIO, NRST, 3V3. SWDIO/SWCLK land on the LED_BAT nets
+ # (same pins). Hand-solder header, DNP at assembly.
+ 'J5': ('SWD_HDR', 'Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical', None, {
+   '1':('GND','GND'), '2':('SWCLK','LED_BAT_B'), '3':('SWDIO','LED_BAT_A'),
+   '4':('NRST','NRST'), '5':('3V3','3V3')}),
  'SW1':('BUTTON', 'Button_Switch_SMD:SW_SPST_PTS647_Sx50', 'C2799716', {
    '1':('A','BUTTON'), '2':('B','GND')}),
  'JP1':('CHG_JUMPER', FP['SJ'], None, {'1':('A','CHG_JPD'), '2':('B','VBACKUP')}),
@@ -191,7 +205,11 @@ def validate():
     G=[('Q1','1','VSYS'),('Q1','4','Q1_GATE'),('Q1','5','VBUS'),
        ('Q2','1','VSYS'),('Q2','4','VBUS'),('Q2','5','VBAT'),
        ('U4','1','GND'),('U3','13','GND'),('U3','12','CONV_EN'),
-       ('U1','3','RTC_INT'),('U2','16','UPDI'),('U2','10','SDA'),('U2','11','SCL'),
+       ('U1','3','RTC_INT'),
+       # PY32F003 MCU (TSSOP-20) key pins — verified vs LCSC C5379864 symbol
+       ('U2','9','3V3'),('U2','7','GND'),('U2','3','VBAT_DIV'),('U2','4','VBUS_DIV'),
+       ('U2','13','SCL'),('U2','14','SDA'),('U2','18','NRST'),
+       ('J5','4','NRST'),('J5','3','LED_BAT_A'),
        ('J4','2','NC'),('D3','2','3V3'),('D4','2','VBACKUP'),
        ('D3','1','RTC_VDD'),('D4','1','RTC_VDD')]
     for ref,pin,net in G:
