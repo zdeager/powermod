@@ -8,7 +8,7 @@
 "1N4148WS","D3,D4,D5","D_SOD-323","C51898295"
 "USB_C_IN","J1","USB_C_Receptacle_TYPE-C_16P_PowerMerged","C165948"
 "USB_C_OUT","J2","USB_C_Receptacle_TYPE-C_16P_PowerMerged","C165948"
-"JST_PH_2","J3","JST_PH_S2B-PH-K_1x02_P2.00mm_Horizontal","C173752"
+"JST_PH_2","J3","JST_PH_S2B-PH-K_1x02_P2.00mm_Horizontal",""
 "STEMMA_QT","J4","JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal","C51940130"
 "SWD_HDR","J5","PinHeader_1x03_P2.54mm_Vertical",""
 "1.5uH","L1","L_Sumida_CDMC6D28_7.25x6.5mm","C5189751"

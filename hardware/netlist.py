@@ -117,7 +117,10 @@ COMPONENTS = {
    'A4':('VBUS','VOUT'),'A9':('VBUS','VOUT'),
    'A5':('CC1','CC1_OUT'),'B5':('CC2','CC2_OUT'),
    'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'SH':('SHIELD','GND')}),
- 'J3': ('JST_PH_2', 'Connector_JST:JST_PH_S2B-PH-K_1x02_P2.00mm_Horizontal', 'C173752', {
+ # LCSC blanked -> DNP/hand-solder (THT). SMT-only assembly order; hand-solder the
+ # 2-pin JST battery connector yourself (part = JST S2B-PH-K / LCSC C173752 if you
+ # source it). Same treatment as J5. Part still on the board + CPL, just not placed.
+ 'J3': ('JST_PH_2', 'Connector_JST:JST_PH_S2B-PH-K_1x02_P2.00mm_Horizontal', None, {
    '1':('BAT+','VBAT'), '2':('BAT-','GND')}),
  'J4': ('STEMMA_QT', 'Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal', 'C51940130', {
    '1':('GND','GND'), '2':('VCC_NC','NC'), '3':('SDA','SDA'), '4':('SCL','SCL')}),
