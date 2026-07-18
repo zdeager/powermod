@@ -121,13 +121,14 @@ COMPONENTS = {
    '1':('BAT+','VBAT'), '2':('BAT-','GND')}),
  'J4': ('STEMMA_QT', 'Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal', 'C51940130', {
    '1':('GND','GND'), '2':('VCC_NC','NC'), '3':('SDA','SDA'), '4':('SCL','SCL')}),
- # SWD programming header (was 3-pin UPDI). PY32 = 2-wire SWD; because the two BAT
- # LEDs share SWDIO/SWCLK, a debugger MUST connect-under-reset, so NRST is brought
- # out. 1x05: GND, SWCLK, SWDIO, NRST, 3V3. SWDIO/SWCLK land on the LED_BAT nets
- # (same pins). Hand-solder header, DNP at assembly.
- 'J5': ('SWD_HDR', 'Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical', None, {
-   '1':('GND','GND'), '2':('SWCLK','LED_BAT_B'), '3':('SWDIO','LED_BAT_A'),
-   '4':('NRST','NRST'), '5':('3V3','3V3')}),
+ # SWD programming header (was 3-pin UPDI). PY32 = 2-wire SWD; target is USB-
+ # powered while flashing, so no VCC pin needed -> 1x03 GND/SWCLK/SWDIO drops into
+ # the exact old UPDI slot (a 5-pin header won't fit this packed corner).
+ # SWDIO/SWCLK land on the LED_BAT nets (shared pins). Because the LEDs share
+ # SWDIO/SWCLK a debugger must connect-under-reset -> NRST is exposed on TP7 (a
+ # probe/tack pad by the MCU) rather than eating a 4th header pin. Hand-solder, DNP.
+ 'J5': ('SWD_HDR', 'Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical', None, {
+   '1':('GND','GND'), '2':('SWCLK','LED_BAT_B'), '3':('SWDIO','LED_BAT_A')}),
  'SW1':('BUTTON', 'Button_Switch_SMD:SW_SPST_PTS647_Sx50', 'C2799716', {
    '1':('A','BUTTON'), '2':('B','GND')}),
  'JP1':('CHG_JUMPER', FP['SJ'], None, {'1':('A','CHG_JPD'), '2':('B','VBACKUP')}),
@@ -146,6 +147,10 @@ COMPONENTS = {
  'TP4':('GND_PAD',     FP['TP'], None, {'1':('P','GND')}),
  'TP5':('VBACKUP_GND_PAD', FP['TP'], None, {'1':('P','GND')}),
  'TP6':('VOUT_GND_PAD',    FP['TP'], None, {'1':('P','GND')}),
+ # NRST probe pad — connect-under-reset for SWD (the BAT LEDs share SWDIO/SWCLK,
+ # so a debugger holds NRST low here while attaching). PY32 NRST has an internal
+ # pull-up; a UART bootloader via BOOT0=PF4 is the fallback if SWD won't attach.
+ 'TP7':('NRST_PAD', FP['TP'], None, {'1':('P','NRST')}),
 }
 # JLC part numbers for the jellybean passives (verified on lcsc.com 2026-07-17).
 # Resistors: UNI-ROYAL 0402WGF series (JLC Basic). Caps: Samsung CL-series
@@ -209,7 +214,7 @@ def validate():
        # PY32F003 MCU (TSSOP-20) key pins — verified vs LCSC C5379864 symbol
        ('U2','9','3V3'),('U2','7','GND'),('U2','3','VBAT_DIV'),('U2','4','VBUS_DIV'),
        ('U2','13','SCL'),('U2','14','SDA'),('U2','18','NRST'),
-       ('J5','4','NRST'),('J5','3','LED_BAT_A'),
+       ('TP7','1','NRST'),('J5','3','LED_BAT_A'),
        ('J4','2','NC'),('D3','2','3V3'),('D4','2','VBACKUP'),
        ('D3','1','RTC_VDD'),('D4','1','RTC_VDD')]
     for ref,pin,net in G:
