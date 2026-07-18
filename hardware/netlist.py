@@ -129,16 +129,21 @@ COMPONENTS = {
  # probe/tack pad by the MCU) rather than eating a 4th header pin. Hand-solder, DNP.
  'J5': ('SWD_HDR', 'Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical', None, {
    '1':('GND','GND'), '2':('SWCLK','LED_BAT_B'), '3':('SWDIO','LED_BAT_A')}),
- 'SW1':('BUTTON', 'Button_Switch_SMD:SW_SPST_PTS647_Sx50', 'C2799716', {
+ # C&K PTS647SN50SMTR2LFS (C2799414, ~9k stock) — in-stock sibling of the OOS
+ # SK50; identical PTS647 4.5x4.5 SMD land pattern (Sx50 footprint), N vs K is
+ # only plunger height. Drop-in, no board change.
+ 'SW1':('BUTTON', 'Button_Switch_SMD:SW_SPST_PTS647_Sx50', 'C2799414', {
    '1':('A','BUTTON'), '2':('B','GND')}),
  'JP1':('CHG_JUMPER', FP['SJ'], None, {'1':('A','CHG_JPD'), '2':('B','VBACKUP')}),
  'JP2':('VSEL_JUMPER', FP['SJ'], None, {'1':('A','FB_MID'), '2':('B','VOUT')}),
- # C17554046 = Sumida CDMC6D28NP-1R5MC — the ONLY LCSC 1.5uH that fits this
- # footprint exactly (pads 2.0x3.4mm @ 5.7mm; verified 2026-07-17), but OOS at
- # LCSC. Consign it (stocked at Digi-Key/Mouser) or hand-solder (2 big pads,
- # trivial). In-stock alts (Chilisin SCDS74 6.9mm, CENKER 6x6 4.2mm) have a
- # different pad pitch -> would need a footprint change + switch-node re-route.
- 'L1': ('1.5uH_4.5A', 'Inductor_SMD:L_Sumida_CDMC6D28_7.25x6.5mm', 'C17554046', {
+ # CYA0650-1.5UH (Chilisin, C5189751, ~11k stock, Extended) — in-stock swap for
+ # the OOS Sumida CDMC6D28. Its lands are 2.35x3.5mm @ 5.7mm PITCH; the pitch
+ # matches this footprint (Sumida pads were 2.0x3.4mm @ 5.7mm), and body is
+ # 7.2x6.6mm ~ the Sumida's 7.25x6.5mm, so it drops onto the existing land
+ # pattern with NO board change (terminals slightly wider than the pads ->
+ # solders fine). Rating: a 7.2x6.6mm 1.5uH molded part is Isat ~9A typ, well
+ # above the 3-4A converter peak — CONFIRM exact Isat/Irms on the datasheet.
+ 'L1': ('1.5uH', 'Inductor_SMD:L_Sumida_CDMC6D28_7.25x6.5mm', 'C5189751', {
    '1':('1','L1N'), '2':('2','L2')}),
  # --- test pads ---
  'TP1':('VBACKUP_PAD', FP['TP'], None, {'1':('P','VBACKUP')}),
