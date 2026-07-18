@@ -211,11 +211,15 @@ def u(): return str(uuid.uuid4())
 
 def gen_bom(path):
     """JLCPCB assembly BOM (Comment, Designator, Footprint, LCSC Part #).
-    Parts with no LCSC (test points, solder jumpers, J5 header) are emitted with
-    a blank LCSC = 'do not place / hand-solder' at upload time."""
+    Test points and solder jumpers are bare copper (not components) and have no
+    CPL placement, so they are OMITTED — leaving them in makes JLC warn
+    'designators don't exist in the CPL file'. Real parts with no LCSC (e.g. the
+    J5 header) stay, with a blank LCSC = 'do not place / hand-solder' at upload."""
     from collections import defaultdict
+    NONPLACED=('TestPoint','SolderJumper','Jumper')  # copper features, not parts
     groups=defaultdict(list)  # (value, footprint, lcsc) -> [refs]
     for ref,(val,fp,lcsc,pins) in COMPONENTS.items():
+        if any(k in fp for k in NONPLACED): continue
         groups[(val,fp,lcsc or '')].append(ref)
     def keyf(r): return (r[0][0], int(''.join(c for c in r[0] if c.isdigit()) or 0))
     rows=[]
