@@ -175,7 +175,7 @@ COMPONENTS = {
 # Resistors: UNI-ROYAL 0402WGF series (JLC Basic). Caps: Samsung CL-series
 # (Basic) except 1u=C5673 (Extended, 25V, well-stocked; the Basic 50V had 50 in stock).
 PASSIVE_LCSC = {
-  '560':'C25126','1k':'C11702','1.2k':'C25862','5.1k':'C25905','10k':'C25744',
+  '560':'C137858','1k':'C11702','1.2k':'C25862','5.1k':'C25905','10k':'C25744',  # 560R: YAGEO RC0402JR-07560RL (was UNI-ROYAL C25126, JLC shortfall 2026-07-19)
   '47k':'C25792','56k':'C25796','100k':'C25741','180k':'C25760','330k':'C25778',
   '620k':'C270590','1M':'C26083',
   '100n':'C1525','10u':'C15850','22u':'C45783','1u':'C5673','4.7u':'C19666',
