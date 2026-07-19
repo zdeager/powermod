@@ -107,23 +107,25 @@ COMPONENTS = {
  # --- connectors / electromech ---
  # merged-pad USB-C: reversible twins (A4≡B9, A9≡B4, A1≡B12, A12≡B1) share ONE pad,
  # so VBUS/GND are single pads -> no coincident-pad DRC flags, cleaner escape.
- # CC-PIN FIX (2026-07-19): the local merged-pad footprint's inner-pin NAMES are
- # MIRRORED vs the real C165948 land pattern (verified pad-for-pad against the
- # LCSC model). GND (A1/A12) and VBUS (A4/A9) sit on symmetric positions so they
- # were fine, but CC was on the wrong pads: the real CC1(A5)/CC2(B5) pins
- # physically land on the pads this footprint calls A8/B8. So CC now goes on
- # A8/B8; the pads named A5/B5 receive the real A8/B8 (reserved) pins -> NC.
- # Without this, the CC pulldowns land on NC pins and USB-C never enables VBUS.
+ # CC PINS = A5/B5 (2026-07-19, CORRECTED): the footprint is NOT mirrored. Verified
+ # three ways — (1) USB-C spec: CC1=A5, CC2=B5, SBU1=A8, SBU2=B8; (2) the real
+ # C165948 is the TYPE-C-31-M-12, standard pinout (LCSC/EasyEDA land pattern);
+ # (3) KiCad's authoritative HRO TYPE-C-31-M-12 footprint is geometrically
+ # IDENTICAL to ours (pad "A5" @ x=-1.25 = CC1, pad "A8" @ x=+1.25 = SBU1). So CC
+ # belongs on A5/B5 and A8/B8 are the (unused) SBU pins -> NC. NOTE: commit a2826a7
+ # wrongly moved CC to A8/B8 on a bogus "mirrored footprint" claim — that put the CC
+ # resistors on the floating SBU pins (board would not negotiate VBUS). This reverts
+ # it. Do NOT move CC off A5/B5 again without re-checking against the HRO footprint.
  'J1': ('USB_C_IN', 'powermod:USB_C_Receptacle_TYPE-C_16P_PowerMerged', 'C165948', {
    'A1':('GND','GND'),'A12':('GND','GND'),
    'A4':('VBUS','VBUS'),'A9':('VBUS','VBUS'),
-   'A8':('CC1','CC1_IN'),'B8':('CC2','CC2_IN'), 'A5':('nc','NC'),'B5':('nc','NC'),
+   'A5':('CC1','CC1_IN'),'B5':('CC2','CC2_IN'), 'A8':('nc','NC'),'B8':('nc','NC'),
    'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'SH':('SHIELD','GND')}),
- # Same mirrored-footprint CC fix as J1 (see note above): CC on A8/B8, A5/B5 -> NC.
+ # CC on A5/B5, A8/B8 (SBU) -> NC (see the corrected note above).
  'J2': ('USB_C_OUT', 'powermod:USB_C_Receptacle_TYPE-C_16P_PowerMerged', 'C165948', {
    'A1':('GND','GND'),'A12':('GND','GND'),
    'A4':('VBUS','VOUT'),'A9':('VBUS','VOUT'),
-   'A8':('CC1','CC1_OUT'),'B8':('CC2','CC2_OUT'), 'A5':('nc','NC'),'B5':('nc','NC'),
+   'A5':('CC1','CC1_OUT'),'B5':('CC2','CC2_OUT'), 'A8':('nc','NC'),'B8':('nc','NC'),
    'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'SH':('SHIELD','GND')}),
  # LCSC blanked -> DNP/hand-solder (THT). SMT-only assembly order; hand-solder the
  # 2-pin JST battery connector yourself (part = JST S2B-PH-K / LCSC C173752 if you
@@ -179,7 +181,10 @@ def C(val,a,b,fp='C04'): return (val, FP[fp], PASSIVE_LCSC.get(val), {'1':('1',a
 COMPONENTS.update({
  'R1': R('1.2k','PROG','GND'),          # TP4056 1A
  'R2': R('5.1k','CC1_IN','GND'),  'R3': R('5.1k','CC2_IN','GND'),
- 'R4': R('56k','CC1_OUT','VOUT'), 'R5': R('56k','CC2_OUT','VOUT'),
+ # R4/R5 swapped vs CC1/CC2 (2026-07-19): CC1/CC2 are symmetric (identical 56k Rp),
+ # and after the A5/B5 CC fix R4 sits beside J2.B5 and R5 beside J2.A5 — so label
+ # R5=CC1_OUT (->A5), R4=CC2_OUT (->B5) to keep each Rp next to its pad, no crossover.
+ 'R4': R('56k','CC2_OUT','VOUT'), 'R5': R('56k','CC1_OUT','VOUT'),
  'R6': R('1M','VBAT','VBAT_DIV'), 'R7': R('330k','VBAT_DIV','GND'),
  'R8': R('1M','VBUS','VBUS_DIV'), 'R9': R('330k','VBUS_DIV','GND'),
  'R10':R('100k','VSYS','Q1_GATE'),      # Q1 pull-up
