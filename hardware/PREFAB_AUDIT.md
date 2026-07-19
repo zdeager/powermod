@@ -4,6 +4,8 @@ Full verification of `powermod.kicad_pcb` (renamed from powermod_mount 2026-07-1
 and fab constraints. Method + findings recorded so a re-audit after any change
 can rerun the same checks.
 
+> **⚠ SNAPSHOT PREDATES THE MCU MIGRATION.** This audit was run against the **ATtiny1616** board (214 pads). The design has since migrated to the **PY32F003F18P6** (ARM Cortex-M0+, TSSOP-20, instock-parts branch, 2026-07-18) — so the "ATtiny1616 SOIC-20 ✓" pinout line, the ATtiny voltage-variant advice (-SN/-SFR), the `C614136` BOM row, and "J5 (UPDI header)"/UPDI programming step below are **historical, not current**. The current board is **226 pads**, J5 is a **4-pin SWD** header, and the PY32 min supply is 1.7 V. A fresh from-scratch production audit was run 2026-07-19 (USB-C CC, XC6206-MR pinout, BOM/CPL/DRU) — see that session; the authoritative electrical map is `netlist.py`.
+
 ## Checks performed and results
 
 | Check | Method | Result |

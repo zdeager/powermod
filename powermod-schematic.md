@@ -179,7 +179,9 @@ IN (3) → VSYS + 1µF→GND; OUT (2) → **3V3** + 1µF→GND; VSS (1) → GND.
 
 ## 4. Layout
 
-There are two boards. **v2 (`hardware/layout_v2.py` → `powermod_v2.kicad_pcb`) is the active design**; v1 is a superseded milestone kept for its lessons. Both read the same `netlist.py`, so ERC and the BOM apply to both.
+> **⚠ CURRENT STATE (2026-07-19): one board — `hardware/powermod.kicad_pcb`.** The v1/v2 two-board narrative below is historical. The shipping board is **65.0 × 40.0 mm, 4-layer, PY32F003 MCU**, fully routed (0 DRC, 0 unrouted, USB-C CC on **A5/B5**, U3 EP tied with 4 GND vias). **The 65×40 outline — 10 mm taller than the 65×30 Witty Pi footprint described in §4.0 — is INTENTIONAL:** the extra band carries the user-accessible interface (button, LEDs, STEMMA-QT, test/jumper pads) **outside** the Witty Pi footprint, overhanging on top so it stays reachable when the board is stacked on a Pi Zero. The Pi Zero 58×23 mm mounting pattern (H1–H4) is preserved. **Do not "correct" the outline to 65×30.**
+
+The two boards below are kept for their lessons; both read the same `netlist.py`, so ERC and the BOM apply.
 
 ### 4.0 v2 — Raspberry Pi Zero / Witty Pi 4 form factor, 4-layer
 

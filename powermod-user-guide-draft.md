@@ -173,7 +173,7 @@ If a battery is deeply discharged with no charging source, PowerMOD itself may e
 
 | | |
 |---|---|
-| Microcontroller | **ATtiny1617 (24-pin)** |
+| Microcontroller | **PY32F003F18P6** (ARM Cortex-M0+, 48 MHz, TSSOP-20) — *migrated from the ATtiny1617 for assembly availability (instock-parts branch, 2026-07-18)* |
 | Realtime Clock | BM8563-class (PCF8563-compatible) + 32.768 kHz crystal. ~±20 ppm; **not** temperature-compensated — see Section 1.2 for drift vs. temperature |
 | DC/DC Converter | TPS63020 buck-boost, selectable 3.3V or 5V output (jumper/solder-bridge, default 5V) |
 | Charging Manager | **TP4056 charger behind a PFET power-OR** — up to 1A charge current. **No battery temperature qualification** — see Section 1.1 |
@@ -382,7 +382,7 @@ If you skip step 3, nothing you wrote will survive — or take effect at all. Se
 
 ### 4.5 Firmware Updates
 
-PowerMOD's firmware can be updated in the field via its 3-pin **UPDI** header (UPDI, VCC, GND). **Note this is UPDI, not the older AVR ISP** — a conventional 6-pin AVR ISP programmer will not work. Use any UPDI-capable programmer (SerialUPDI, jtag2updi, or a Microchip debugger); the Arduino IDE drives these via megaTinyCore if that's your preference. **Your RTC calibration and configuration (voltage thresholds, power-on mode, I2C address, etc.) are stored separately from the firmware itself and survive a reflash** — you should not need to back these up or restore them manually.
+PowerMOD's firmware can be updated in the field via its 4-pin **SWD** header (GND, SWCLK, SWDIO, NRST). Use any SWD programmer — an ST-Link clone, a CMSIS-DAP/DAPLink, or a J-Link — driven by PyOCD or OpenOCD (PY32F0 support is upstream in both). **The two battery-status LEDs share the SWDIO/SWCLK pins, so the debugger must _connect under reset_ — that is why NRST is brought out to the header.** The USB-serial bootloader (via BOOT0) is the fallback if SWD is unavailable. One caution: **do not flash with a deeply-discharged battery attached** — the programmer's 3.3 V can back-feed through the LDO. Configuration (voltage thresholds, power-on mode, I2C address, RTC calibration) is kept in a reserved flash region (the PY32 has no separate EEPROM); a normal firmware update preserves it, but a full chip-erase clears it — use your programmer's application-only (config-preserving) update, not mass-erase, unless you intend to reset configuration.
 
 ---
 

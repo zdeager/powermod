@@ -100,5 +100,8 @@ SPICE (`tools/spice/`):
 v1 (58×40, 2-layer) had 3A rails at 0.2 mm (the `.kicad_dru` lesson); v2
 (65×30) was superseded by this board; the QFN-package MCU was swapped for the
 SOIC-20 ATtiny1616 to break the routing wall; `powermod_mount.*` was renamed
-to `powermod.*` once it became the only board (2026-07-17). Lessons live in
+to `powermod.*` once it became the only board (2026-07-17); then the MCU
+migrated **ATtiny1616 → PY32F003F18P6** (TSSOP-20, ARM Cortex-M0+) on the
+`instock-parts` branch (2026-07-18) for JLC assembly availability, with a full
+reroute — the current board is 65×40, 4-layer, PY32. Lessons live in
 the tools and `PREFAB_AUDIT.md`, not in stale board files.
