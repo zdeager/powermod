@@ -68,7 +68,11 @@ COMPONENTS = {
    '1':('TEMP','GND'), '2':('PROG','PROG'), '3':('GND','GND'), '4':('VCC','VBUS'),
    '5':('BAT','VBAT'), '6':('STDBY','CHG_STDBY'), '7':('CHRG','CHG_CHRG'),
    '8':('CE','CHG_CE'), '9':('PAD','GND')}),
- 'U5': ('XC6206P332MR', FP['SOT'], 'C5446', {   # pin order = convention, VERIFY
+ # Pinout VERIFIED 2026-07-19 vs Torex XC6206 datasheet: the XC6206 has TWO
+ # pin variants (MR vs PR). Ours is the -MR- package (C5446 = XC6206P332MR-G),
+ # whose SOT-23 assignment is pin1=VSS, pin2=VOUT, pin3=VIN -> matches below.
+ # (The PR package differs; do NOT copy this to a PR part.)
+ 'U5': ('XC6206P332MR', FP['SOT'], 'C5446', {
    '1':('VSS','GND'), '2':('VOUT','3V3'), '3':('VIN','VSYS')}),
  # --- FETs ---
  'Q1': ('AON7407', 'Package_DFN_QFN:DFN-8-1EP_3x3mm_P0.65mm_EP1.6x2.56mm', 'C176756', {
