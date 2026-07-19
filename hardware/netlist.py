@@ -107,15 +107,23 @@ COMPONENTS = {
  # --- connectors / electromech ---
  # merged-pad USB-C: reversible twins (A4≡B9, A9≡B4, A1≡B12, A12≡B1) share ONE pad,
  # so VBUS/GND are single pads -> no coincident-pad DRC flags, cleaner escape.
+ # CC-PIN FIX (2026-07-19): the local merged-pad footprint's inner-pin NAMES are
+ # MIRRORED vs the real C165948 land pattern (verified pad-for-pad against the
+ # LCSC model). GND (A1/A12) and VBUS (A4/A9) sit on symmetric positions so they
+ # were fine, but CC was on the wrong pads: the real CC1(A5)/CC2(B5) pins
+ # physically land on the pads this footprint calls A8/B8. So CC now goes on
+ # A8/B8; the pads named A5/B5 receive the real A8/B8 (reserved) pins -> NC.
+ # Without this, the CC pulldowns land on NC pins and USB-C never enables VBUS.
  'J1': ('USB_C_IN', 'powermod:USB_C_Receptacle_TYPE-C_16P_PowerMerged', 'C165948', {
    'A1':('GND','GND'),'A12':('GND','GND'),
    'A4':('VBUS','VBUS'),'A9':('VBUS','VBUS'),
-   'A5':('CC1','CC1_IN'),'B5':('CC2','CC2_IN'),
+   'A8':('CC1','CC1_IN'),'B8':('CC2','CC2_IN'), 'A5':('nc','NC'),'B5':('nc','NC'),
    'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'SH':('SHIELD','GND')}),
+ # Same mirrored-footprint CC fix as J1 (see note above): CC on A8/B8, A5/B5 -> NC.
  'J2': ('USB_C_OUT', 'powermod:USB_C_Receptacle_TYPE-C_16P_PowerMerged', 'C165948', {
    'A1':('GND','GND'),'A12':('GND','GND'),
    'A4':('VBUS','VOUT'),'A9':('VBUS','VOUT'),
-   'A5':('CC1','CC1_OUT'),'B5':('CC2','CC2_OUT'),
+   'A8':('CC1','CC1_OUT'),'B8':('CC2','CC2_OUT'), 'A5':('nc','NC'),'B5':('nc','NC'),
    'A6':('D+','NC'),'A7':('D-','NC'),'B6':('D+','NC'),'B7':('D-','NC'),'SH':('SHIELD','GND')}),
  # LCSC blanked -> DNP/hand-solder (THT). SMT-only assembly order; hand-solder the
  # 2-pin JST battery connector yourself (part = JST S2B-PH-K / LCSC C173752 if you
