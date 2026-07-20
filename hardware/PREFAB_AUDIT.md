@@ -146,9 +146,11 @@ designer. Cross-checked every BOM part's package vs its board footprint:
   footprint. The earlier ~0.9mm flag was LCSC's own oversized reference
   footprint — irrelevant to assembly (JLC places the part on our datasheet-
   correct pads). No change needed.
-- **Through-hole parts: J3 (JST-PH battery) and J5 (UPDI header)** — hand-solder
-  or use JLC's THT-assembly service (extra cost); JLC's SMT line won't place
-  them.
+- **Through-hole parts: J3 (JST-PH battery, S2B-PH-K 2.00mm side-entry) and J5
+  (now the 1×4 2.54mm SWD header — was UPDI)** — hand-solder or use JLC's
+  THT-assembly service (extra cost); JLC's SMT line won't place them. **Source
+  these yourself; they are not in the assembly BOM.** J4 (STEMMA-QT, C51940130)
+  *is* SMT-assembled, but you need a JST-SH 4-pin cable to use it.
 
 ### CPL rotation (2026-07-18)
 
@@ -172,12 +174,23 @@ attention to the ICs and SOT-23s above. LED/diodes/USB-C are pre-verified.
 
 ## Firmware contract (hardware assumes these)
 
-1. ADC reference: **use VDD (3.3V) or the 2.5V internal ref** — VBUS_DIV maxes
-   ~1.3V, well inside either. Do NOT use 1.1V (clips VBUS_DIV) and avoid 1.5V
-   (only 0.13V headroom at 5.5V USB max — brittle). VDD-ref is simplest;
-   2.5V-ref is more accurate if VDD ripple matters. Divider resolution with
-   VDD ref: ~13mV/LSB at the battery (10-bit) — ample for monitoring.
-2. Internal pull-up on PA2 (button has no external pull-up).
+1. ADC reference: **the PY32F003 has NO selectable internal reference — the
+   reference is VDDA (the 3.3V LDO rail).** Firmware must sample the internal
+   **1.2V VREFINT** channel each conversion, compute true VDDA, and rescale
+   VBAT_DIV/VBUS_DIV (spec §ADC, ↪PY32 note). That is what keeps readings
+   honest once the LDO drops out at low battery — exactly where the cutoff
+   decision is made. VBUS_DIV maxes ~1.3V, well inside the 3.3V full scale.
+   Absolute accuracy is capped at **~±2.5%** by VREFINT's own tolerance
+   (1.17–1.23V, no per-part cal); the relative trend is much tighter. Divider
+   resolution: **~3.2mV/LSB at the battery (12-bit)** — ample.
+   *(Superseded ATtiny text: "use VDD or the 2.5V internal ref… ~13mV/LSB
+   (10-bit)". The selectable 1.1/1.5/2.5V refs and the 10-bit ADC are
+   AVR-only — do not follow that guidance on this board.)*
+2. Internal pull-up on **PA1** — the button pin. SW1 ties BUTTON→GND with no
+   external pull-up. **Corrected 2026-07-20: this previously said PA2, which is
+   ATtiny-era. On the PY32 board `PA2` is `Q1_GATE_DRV` (the power-path gate
+   drive)** — enabling a pull-up there instead would leave a dead button and
+   poke the gate drive. Authoritative pin map: `netlist.py` U2.
 3. Poll VBUS_DIV; **drop Q1_GATE_DRV when VBUS disappears** (hardware allows
    a brief battery→USB backfeed window through Q1 until firmware reacts).
 4. CONV_EN idles low via R14 → Pi is off until firmware enables (by design).
@@ -206,5 +219,25 @@ attention to the ICs and SOT-23s above. LED/diodes/USB-C are pre-verified.
 ## Bring-up plan
 
 Populate one board first. Bench supply, current-limited, on VBUS pads before
-any battery. Verify: 3V3 rail → UPDI contact → VOUT=5.00V with CONV_EN driven
-high → charge current 1A into a dummy load/cell → then battery + Pi.
+any battery. Verify: continuity/short check (VBUS, 3V3, VBAT, VOUT vs GND)
+*before* power → 3V3 rail → **SWD contact** (connect **under reset** — the two
+BAT LEDs share SWDIO/SWCLK, which is why NRST is on J5) → VOUT=5.00V with
+CONV_EN driven high → charge current 1A into a dummy load/cell → then battery
++ Pi.
+
+Notes that bite in this order:
+- **Check JP2 before connecting a Pi** — it selects VOUT 3.3V vs 5V (default
+  5V). Wrong setting into a 3.3V host destroys the host.
+- **CONV_EN idles low via R14**, so VOUT should read ~0V at first power. A live
+  VOUT before firmware enables it means something is wrong.
+- **J3/J5 are hand-solder** (not in the JLC assembly). Fit J5 early — SWD comes
+  before everything. Leave J3 until the charger stage.
+- **J3 has no reverse-polarity protection: a reversed cell destroys the
+  TP4056.** Vendors wire PH pigtails both ways — meter every pigtail before it
+  touches the board (findings §2).
+- **Never flash with a deeply-discharged cell attached** — the programmer's
+  3.3V back-feeds through the LDO.
+- Two paths are unproven by paper and get validated here: the **`CE`
+  battery-present decay test** (~500ms delta) and **converter efficiency**.
+  Also scope **VSYS during a USB unplug** for the backfeed window before
+  firmware drops `Q1_GATE_DRV`.
