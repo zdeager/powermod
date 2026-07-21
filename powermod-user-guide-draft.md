@@ -206,6 +206,12 @@ If a battery is deeply discharged with no charging source, PowerMOD itself may e
 - **Your LiPo narrows it further**, and by more than you might assume: typical cells discharge down to about −20°C but are only safe to **charge between roughly 0°C and 45°C**. PowerMOD does not enforce that (see the warning in Section 1.1) — check your own cell's datasheet.
 - **Running without a coin cell or without a battery widens the range back out** toward the electronics' own −40°C to +85°C. Mains-only mode with no coin cell is the most temperature-tolerant way to run PowerMOD.
 
+> ### ⚠️ Feed the input 5V only — there is no overvoltage protection
+>
+> The USB-C input expects a **nominal 5V supply and nothing else.** PowerMOD does no PD negotiation (it requests 5V and takes what it's given), and there is **no TVS, clamp or overvoltage protection on the input.** The converter's recommended input maximum is **5.5V**, which a fully-compliant USB-C source is already allowed to deliver — so the margin at the top is **zero by design**, and its absolute maximum is 7V.
+>
+> **Anything that puts more than ~5.5V on the input destroys the converter and probably the charger with it.** In practice that means: do not use a **USB-C PD trigger board** set to 9V/12V/15V/20V, do not feed the input from a higher-voltage adapter, and do not connect a bench supply set above 5V to the VBUS pads. A normal 5V USB charger, phone charger, or PD source (which will negotiate down to 5V on its own) is fine.
+
 **On the output current figures:** an earlier draft advertised a single "3A," which was never achievable — a non-PD USB-C input tops out at 15W total (covering the host *and* charging), and 3A at 5V draws more than double the battery connector's rating on the battery side. The honest answer isn't one smaller number, it's a table:
 
 **There is no single output-current number, and any product that gives you one is hiding something.** What PowerMOD can deliver depends on where the power is coming from and how the battery is wired:
@@ -333,6 +339,8 @@ The distinction is "was this reachable when you asked for it," which PowerMOD ca
 
   **These are two registers rather than one for a reason that matters to you:** booting is itself an event. If a single register held both, the wake reason would overwrite the power-off reason during the very act of powering your host up — so by the time your host could read it, "why did I lose power last time" would always have been replaced by "because you just woke up." Kept separate, the power-off reason survives your boot and is still there to read.
 - **Read event log.** PowerMOD keeps the last 8 power transitions (each a reason code + timestamp, same format as the most-recent-reason registers above) in non-volatile storage, so it survives power loss and firmware updates. Useful for understanding what happened over multiple cycles on a remote device you can't check on in person — e.g., seeing a pattern of repeated low-voltage cutoffs might indicate a failing battery or charging problem before it becomes a hard failure. The log is a circular buffer (oldest entries are overwritten as new ones are added) rather than an unlimited history.
+
+  **⚠️ One ambiguity to know about when reading that pattern: PowerMOD does not measure output current.** It senses battery and input *voltage* only, so it cannot distinguish "the battery is weak" from "the host drew more than the supply could deliver and dragged the rail down." Both appear in the log as low-voltage cutoffs. Before concluding a cell is failing on a remote device, consider whether the host has a periodic heavy load or the supply is undersized (FAQ 5.10) — a healthy battery under an overloaded supply logs exactly like a dying one.
   - **If you use relative-time scheduling** (Section 4.1) and never set wall-clock time, the log's timestamps are offsets from an arbitrary epoch and restart from zero after any RTC reset — so read them for *ordering and intervals* ("three cutoffs within an hour of each other"), which is most of what the log is for, rather than as wall-clock history.
 
 ### 4.4 Configuration
@@ -435,6 +443,13 @@ For a host that needs 3.3V instead of 5V, PowerMOD's output voltage (both USB-C 
 
 **In 3.3V mode, use the raw VOUT header, not the USB-C output.** Nothing that expects USB-C power expects 3.3V on it, so the USB-C output isn't meaningful in this mode — it will still advertise itself as a nominal 5V source even though it isn't one. This won't hurt anything you're likely to plug in, but the raw header is the intended path for 3.3V hosts.
 
+**The two outputs are one rail, not two.** The USB-C output and the raw VOUT header are the same electrical node. Practical consequences:
+
+- **They are always at the same voltage**, whichever the jumper selects. You cannot run the USB-C port at 5V and the header at 3.3V.
+- **They share one current budget.** Every figure in Section 2 is the *total* across both, not per-output. Drawing 1A from each is 2A total, and on a battery via the JST connector that is already over budget.
+- **They switch off together.** VOUT is a *switched* rail — when PowerMOD powers your host down (scheduled shutdown, low-battery cutoff, button press), **both outputs go to 0V.** There is no always-on output. If you need something permanently powered, VOUT is the wrong tap.
+- **⚠️ Never feed power *into* either output.** Because they are one node, back-feeding either one energises the other. This is harmless in 5V mode (5V meeting 5V), but **in 3.3V mode it puts 5V onto a 3.3V host** — an overvoltage event on your own hardware. If you run in 3.3V mode, treat *both* connection points as outputs that must never be driven.
+
 ### 5.5 Is my battery protected against reverse polarity?
 
 **No. And the connector will not save you — it is keyed, which is exactly the problem.**
@@ -452,6 +467,20 @@ For a host that needs 3.3V instead of 5V, PowerMOD's output voltage (both USB-C 
 > If you're building more than a handful, consider soldering the cell to the labelled BAT/GND pads instead of using the connector. A pad is unambiguous in a way a keyed plug is not.
 >
 > **This is not a PowerMOD quirk.** Boards in this category ship this hazard unmitigated as a rule — the Witty Pi 4 L3V7 uses the same PH2.0 connector, has no protection either, and does not mention polarity anywhere in its 53-page manual. We would rather tell you than match them in silence.
+
+**Related, and more dangerous — do not connect two batteries.** PowerMOD gives you two places to attach a cell: the JST connector and the labelled BAT/GND solder pads. **They are the same electrical node.** They are two ways to connect *one* battery, not two battery inputs.
+
+> ### ⚠️ One cell, one connection point — never both
+>
+> Attaching a cell to the JST connector *and* another to the BAT pads wires the two cells in **direct parallel**, with nothing between them but board copper — no fuse, no balancing, no isolation, no current limiting.
+>
+> - **Even with correct polarity, mismatched cells are a hazard.** The fuller cell dumps into the emptier one, limited only by their internal resistance. A full cell meeting a flat one can push **6 A or more**, for *minutes*, until they equalise. That current runs through the 2 A-rated JST connector, and it completely bypasses the charger — including the gentle preconditioning a deeply-discharged cell requires. Hard-charging a flat lithium cell at several amps is a fire risk.
+> - **With one cell reversed, it is far worse than the single-cell case above.** Two cells connected in opposition are a **dead short through both of them** — roughly 8.4 V across a few hundred milliohms, on the order of **40 A**. That is a venting/fire event, not merely a destroyed charger. Two connection points also double your chances of making a polarity mistake in the first place.
+> - **The charger cannot help you.** It sees a single pair of terminals and one voltage. It has no way to know there are two cells, that one is weak or aged, or that they have drifted apart.
+>
+> **If you want more capacity, fit one larger cell.** PowerMOD is indifferent between a 1000 mAh and a 10000 mAh battery, and this sidesteps every problem above. If you genuinely must parallel cells, join them into a **single pack with one pigtail before the board** — identical model, batch and age, each charged to within ~50 mV of the other first, and never hot-plugged onto a live pack. Do not use PowerMOD's two connection points as the joining method.
+>
+> Note this buys you no extra *current*, only runtime — the connector, not the battery, is what caps output (FAQ 5.10).
 
 ### 5.6 What if the I2C bus itself becomes stuck or unresponsive?
 
@@ -472,6 +501,20 @@ No PowerMOD-specific guidance beyond standard LiPo/Li-ion battery handling pract
 Not something PowerMOD is designed for — one board per host is the only configuration considered or intended. Using multiple PowerMODs on a shared I2C bus hasn't been tested and isn't something we're planning to support.
 
 **The reverse also isn't supported: one PowerMOD controlled by two hosts (two I2C masters).** Behaviour in that configuration is undefined — nothing arbitrates between two hosts writing conflicting wake times, or one host issuing a power-off request while the other assumes it's still running. PowerMOD assumes exactly one controlling host, and that assumption is load-bearing throughout its design.
+
+### 5.10 What happens if my host tries to draw too much current?
+
+**Electrically, it's graceful — the voltage sags, nothing breaks.** The converter has its own current limit and thermal shutdown: past its limit it simply stops regulating and **VOUT droops** rather than failing. Even a dead short on the output just parks it in current limit. The power-path transistors are rated above anything the converter will pass, and the traces were sized with margin.
+
+**What you'll actually experience** is your host browning out — a Raspberry Pi trips its undervoltage detector around 4.65V, so expect the undervoltage flag, instability and reboots. **The realistic damage is to your data, not your hardware:** a brownout mid-write is how SD cards get corrupted.
+
+**There is one thing that genuinely can be damaged, and it's the battery connector.** Because the converter boosts from a 3.0–4.2V cell up to 5V, the *battery-side* current is much higher than what your host is drawing — roughly **3A from the cell for 2A out at 5V**. The JST-PH connector is rated 2A and has **no protection of any kind**: nothing trips, the crimp and housing simply get hot. Sustained overload on a JST-connected cell is the one case to actively avoid.
+
+Be aware there is **no fuse, no resettable fuse, and no output overcurrent protection anywhere on the board.** The converter's internal limit is the entire protection story.
+
+**On mains, overload has a second effect worth knowing.** PowerMOD has no input current limiting, so it will overdraw a weak supply. When that happens the input voltage sags below the battery voltage and **the cell quietly takes over the load — while you are still plugged in.** So an undersized USB supply drains your battery instead of charging it, and the charger's "full" detection is disturbed at the same time. If a device on mains is losing charge, suspect the supply before the battery.
+
+**If you need more current:** solder the cell to the BAT/GND pads instead of using the JST connector (that's the difference between roughly 1.0–1.5A and 1.8–2.6A at 5V), keep the cell well charged, and avoid charging at peak load. Note that 3.3V mode is capped by the converter at 2A regardless, so the pads buy you nothing there. See the per-mode table in Section 2.
 
 ---
 
